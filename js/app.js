@@ -4,24 +4,21 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ===============================================================================
-    // 1. طبقة قاعدة البيانات (IndexedDB Wrapper)
-    //    - هذا الجزء معزول للتعامل مع قاعدة البيانات المحلية.
-    //    - يمكن استبداله بسهولة بـ API calls في المستقبل.
-    //    - لماذا IndexedDB وليس localStorage؟
-    //      - IndexedDB مصمم لتخزين كميات كبيرة من البيانات المنظمة (مثل منتجاتنا).
-    //      - يعمل بشكل غير متزامن (Asynchronous)، فلا يعطل واجهة المستخدم.
-    //      - يدعم الفهرسة، مما يجعل البحث سريعاً جداً.
-    //      - localStorage بسيط لكنه محدود السعة، متزامن (يُبطئ التطبيق)، ويخزن نصوص فقط.
+    // 1. طبقة قاعدة البيانات المتقدمة (Advanced IndexedDB Wrapper)
+    //    - نظام قاعدة بيانات متطور مع دعم النسخ الاحتياطية
+    //    - نظام تنبيهات داخلي متقدم
+    //    - إدارة المستخدمين والصلاحيات
+    //    - نظام سجل العمليات المتقدم
     // ===============================================================================
     const dbManager = {
         db: null,
         dbName: 'SadarahStoreDB',
         storeName: 'products',
+        version: 8, // إصدار جديد مع ميزات متقدمة
 
         open() {
             return new Promise((resolve, reject) => {
-                // زيادة رقم الإصدار للسماح بالترقية
-                const request = indexedDB.open(this.dbName, 7); // <-- زيادة الإصدار إلى 7
+                const request = indexedDB.open(this.dbName, this.version);
 
                 request.onupgradeneeded = (event) => {
                     this.db = event.target.result;
@@ -61,6 +58,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!this.db.objectStoreNames.contains('invoices')) {
                         const invoiceStore = this.db.createObjectStore('invoices', { keyPath: 'id' });
                         invoiceStore.createIndex('date', 'date', { unique: false });
+                        invoiceStore.createIndex('customer', 'customerName', { unique: false });
+                        invoiceStore.createIndex('total', 'total', { unique: false });
+                    }
+                    
+                    // إنشاء جدول المستخدمين في الإصدار 8
+                    if (!this.db.objectStoreNames.contains('users')) {
+                        const userStore = this.db.createObjectStore('users', { keyPath: 'id' });
+                        userStore.createIndex('email', 'email', { unique: true });
+                        userStore.createIndex('role', 'role', { unique: false });
+                    }
+                    
+                    // إنشاء جدول النسخ الاحتياطية في الإصدار 8
+                    if (!this.db.objectStoreNames.contains('backups')) {
+                        const backupStore = this.db.createObjectStore('backups', { keyPath: 'id' });
+                        backupStore.createIndex('date', 'createdAt', { unique: false });
+                        backupStore.createIndex('type', 'type', { unique: false });
+                    }
+                    
+                    // إنشاء جدول إعدادات النظام في الإصدار 8
+                    if (!this.db.objectStoreNames.contains('systemSettings')) {
+                        this.db.createObjectStore('systemSettings', { keyPath: 'key' });
+                    }
+                    
+                    // إنشاء جدول سجل العمليات المتقدم في الإصدار 8
+                    if (!this.db.objectStoreNames.contains('auditLogs')) {
+                        const auditStore = this.db.createObjectStore('auditLogs', { keyPath: 'id' });
+                        auditStore.createIndex('timestamp', 'timestamp', { unique: false });
+                        auditStore.createIndex('operation', 'operation', { unique: false });
+                        auditStore.createIndex('userId', 'userId', { unique: false });
                     }
                 };
 
@@ -265,17 +291,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. نظام التنبيهات والإشعارات
     // ===============================================================================
     const notificationSystem = {
-        // إعدادات الإشعارات
+        // إعدادات الإشعارات المتقدمة
         settings: {
             inAppNotifications: true,
             browserNotifications: false,
-            soundEnabled: false
+            soundEnabled: false,
+            autoHide: true,
+            position: 'top-end',
+            maxNotifications: 5,
+            priority: 'normal'
         },
+        
+        // متغيرات النظام
+        browserSupport: false,
+        permission: 'default',
+        activeNotifications: [],
 
         // تهيئة النظام
         init() {
             this.loadSettings();
             this.checkBrowserNotificationSupport();
+            this.setupNotificationContainer();
+        },
+
+        // إعداد حاوية التنبيهات
+        setupNotificationContainer() {
+            if (!document.getElementById('toast-container')) {
+                const container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = `toast-container position-fixed ${this.settings.position} p-3`;
+                container.style.zIndex = '9999';
+                document.body.appendChild(container);
+            }
         },
 
         // تحميل الإعدادات من localStorage
@@ -405,6 +452,62 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSettings(newSettings) {
             this.settings = { ...this.settings, ...newSettings };
             this.saveSettings();
+        },
+
+        // إشعارات متخصصة للنظام
+        showSuccess(message, duration = 3000) {
+            this.showInAppNotification(message, 'success', duration);
+        },
+
+        showError(message, duration = 5000) {
+            this.showInAppNotification(message, 'error', duration);
+        },
+
+        showWarning(message, duration = 4000) {
+            this.showInAppNotification(message, 'warning', duration);
+        },
+
+        showInfo(message, duration = 3000) {
+            this.showInAppNotification(message, 'info', duration);
+        },
+
+        // تنظيف الإشعارات القديمة
+        cleanupOldNotifications() {
+            if (this.activeNotifications.length >= this.settings.maxNotifications) {
+                const oldest = this.activeNotifications.shift();
+                if (oldest && oldest.element) {
+                    const toast = bootstrap.Toast.getInstance(oldest.element);
+                    if (toast) {
+                        toast.hide();
+                    }
+                }
+            }
+        },
+
+        // إزالة إشعار من القائمة النشطة
+        removeNotification(toastId) {
+            this.activeNotifications = this.activeNotifications.filter(n => n.id !== toastId);
+        },
+
+        // تشغيل صوت التنبيه
+        playNotificationSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (error) {
+                console.warn('لا يمكن تشغيل الصوت:', error);
+            }
         }
     };
 

@@ -1,6 +1,6 @@
 /* --- إعدادات أساسية وخطوط --- */
 body {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', 'Helvetica', sans-serif;
     background-color: var(--bs-body-bg);
 }
 
