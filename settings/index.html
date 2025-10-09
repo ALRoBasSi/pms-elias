@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات - محل الصدارة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg sticky-top bg-body-tertiary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="../products/index.html">
+                <i class="bi bi-shop-window"></i>
+                محل الصدارة
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="main-navbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../products/index.html">المنتجات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../pos/index.html">نقطة البيع</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../reports/index.html">التقارير</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.html">الإعدادات</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary me-2" id="theme-toggler" type="button">
+                        <i class="bi bi-moon-stars-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        <h1>الإعدادات</h1>
+        <div id="settings_content">
+            <ul class="nav nav-tabs" id="settingsTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="structure-tab" data-bs-toggle="tab" data-bs-target="#structure-tab-pane" type="button" role="tab" aria-controls="structure-tab-pane" aria-selected="true">هيكلة النماذج</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="brands-tab" data-bs-toggle="tab" data-bs-target="#brands-tab-pane" type="button" role="tab" aria-controls="brands-tab-pane" aria-selected="false">البراندات</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="units-tab" data-bs-toggle="tab" data-bs-target="#units-tab-pane" type="button" role="tab" aria-controls="units-tab-pane" aria-selected="false">إدارة الوحدات</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reports-settings-tab" data-bs-toggle="tab" data-bs-target="#reports-settings-tab-pane" type="button" role="tab" aria-controls="reports-settings-tab-pane" aria-selected="false">إعدادات التقارير</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pos-settings-tab" data-bs-toggle="tab" data-bs-target="#pos-settings-tab-pane" type="button" role="tab" aria-controls="pos-settings-tab-pane" aria-selected="false">إعدادات نقطة البيع</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-tab-pane" type="button" role="tab" aria-controls="notifications-tab-pane" aria-selected="false">الإشعارات</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="settingsTabContent">
+                <!-- Tab: Form Structure Editor -->
+                <div class="tab-pane fade show active" id="structure-tab-pane" role="tabpanel" aria-labelledby="structure-tab" tabindex="0">
+                    <div class="row">
+                        <div class="col-md-4 border-end">
+                            <h6 class="mb-3">الفئات الرئيسية</h6>
+                            <ul id="main-cat-editor-list" class="list-group list-group-flush mb-3"></ul>
+                            <form id="add-main-cat-form" class="input-group"><input type="text" id="new-main-cat-name" class="form-control form-control-sm" placeholder="إضافة فئة رئيسية..." required><button class="btn btn-outline-primary btn-sm" type="submit" title="إضافة فئة رئيسية جديدة"><i class="bi bi-plus-lg"></i></button></form>
+                        </div>
+                        <div class="col-md-8" id="fields-editor-container"></div>
+                    </div>
+                </div>
+                <!-- Tab: Brands -->
+                <div class="tab-pane fade" id="brands-tab-pane" role="tabpanel" aria-labelledby="brands-tab" tabindex="0">
+                    <h5>إدارة البراندات</h5>
+                    <form id="brand-form" class="mb-3 p-3 border rounded bg-body-tertiary"><input type="hidden" id="brand-id"><label id="brand-form-label" for="brand-name" class="form-label">إضافة براند جديد</label><div class="input-group"><input type="text" id="brand-name" class="form-control" placeholder="اسم البراند" required><button id="save-brand-btn" class="btn btn-primary" type="submit">إضافة</button><button id="cancel-brand-edit-btn" class="btn btn-secondary d-none" type="button">إلغاء</button></div></form>
+                    <ul id="brand-management-list" class="list-group"></ul>
+                </div>
+                <!-- Tab: Units -->
+                <div class="tab-pane fade" id="units-tab-pane" role="tabpanel" aria-labelledby="units-tab" tabindex="0">
+                    <form id="unit-form" class="mb-4"><input type="hidden" id="unit-id"><label for="unit-name" class="form-label" id="unit-form-label">إضافة وحدة جديدة</label><div class="input-group"><input type="text" id="unit-name" class="form-control" placeholder="اسم الوحدة (مثال: قطعة)" required><button class="btn btn-primary" type="submit" id="save-unit-btn">إضافة</button><button class="btn btn-outline-secondary d-none" type="button" id="cancel-unit-edit-btn">إلغاء</button></div></form>
+                    <hr>
+                    <h6>الوحدات الحالية</h6>
+                    <ul class="list-group" id="unit-management-list"></ul>
+                </div>
+                
+                <!-- Tab: Reports Settings -->
+                <div class="tab-pane fade" id="reports-settings-tab-pane" role="tabpanel" aria-labelledby="reports-settings-tab" tabindex="0">
+                    <h5>إعدادات التقارير</h5>
+                    
+                    <!-- تفعيل/تعطيل أنواع التقارير -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">تفعيل أنواع التقارير</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-sales-report" checked>
+                                <label class="form-check-label" for="enable-sales-report">
+                                    تقرير المبيعات حسب فترة
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-top-products-report" checked>
+                                <label class="form-check-label" for="enable-top-products-report">
+                                    تقرير أفضل المنتجات مبيعاً
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-low-stock-report" checked>
+                                <label class="form-check-label" for="enable-low-stock-report">
+                                    تقرير المخزون المنخفض
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-inventory-movement-report" checked>
+                                <label class="form-check-label" for="enable-inventory-movement-report">
+                                    تقرير حركة المخزون
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- إعدادات التصدير -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">إعدادات التصدير</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="csv-delimiter" class="form-label">فاصل CSV</label>
+                                    <select id="csv-delimiter" class="form-select">
+                                        <option value=",">فاصلة (,)</option>
+                                        <option value=";">فاصلة منقوطة (;)</option>
+                                        <option value="\t">Tab</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="date-format" class="form-label">تنسيق التاريخ</label>
+                                    <select id="date-format" class="form-select">
+                                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- إعدادات الجدولة -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">جدولة التقارير الدورية</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-scheduled-reports">
+                                <label class="form-check-label" for="enable-scheduled-reports">
+                                    تفعيل التقارير الدورية
+                                </label>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label for="report-frequency" class="form-label">تكرار التقرير</label>
+                                    <select id="report-frequency" class="form-select" disabled>
+                                        <option value="daily">يومي</option>
+                                        <option value="weekly">أسبوعي</option>
+                                        <option value="monthly">شهري</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="report-time" class="form-label">وقت الإرسال</label>
+                                    <input type="time" id="report-time" class="form-control" value="09:00" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="report-email" class="form-label">البريد الإلكتروني</label>
+                                    <input type="email" id="report-email" class="form-control" placeholder="example@email.com" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="save-reports-settings">
+                        <i class="bi bi-check-lg"></i> حفظ إعدادات التقارير
+                    </button>
+                </div>
+
+                <!-- Tab: POS Settings -->
+                <div class="tab-pane fade" id="pos-settings-tab-pane" role="tabpanel" aria-labelledby="pos-settings-tab" tabindex="0">
+                    <h5>إعدادات نقطة البيع</h5>
+                    
+                    <!-- إعدادات الفاتورة -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">إعدادات الفاتورة</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="store-name" class="form-label">اسم المتجر</label>
+                                    <input type="text" id="store-name" class="form-control" value="محل الصدارة">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="store-address" class="form-label">عنوان المتجر</label>
+                                    <input type="text" id="store-address" class="form-control" placeholder="العنوان الكامل">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="store-phone" class="form-label">رقم الهاتف</label>
+                                    <input type="tel" id="store-phone" class="form-control" placeholder="+966xxxxxxxxx">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="tax-rate" class="form-label">نسبة الضريبة (%)</label>
+                                    <input type="number" id="tax-rate" class="form-control" value="15" min="0" max="100" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- إعدادات ترقيم الفواتير -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">ترقيم الفواتير</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="invoice-prefix" class="form-label">بادئة الفاتورة</label>
+                                    <input type="text" id="invoice-prefix" class="form-control" value="INV" maxlength="10">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="invoice-digits" class="form-label">عدد الأرقام</label>
+                                    <input type="number" id="invoice-digits" class="form-control" value="6" min="3" max="10">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="invoice-start" class="form-label">رقم البداية</label>
+                                    <input type="number" id="invoice-start" class="form-control" value="1" min="1">
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="auto-reset-invoice" checked>
+                                    <label class="form-check-label" for="auto-reset-invoice">
+                                        إعادة تعيين رقم الفاتورة شهرياً
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- إعدادات الطباعة -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">إعدادات الطباعة</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="print-width" class="form-label">عرض الطباعة (مم)</label>
+                                    <input type="number" id="print-width" class="form-control" value="80" min="50" max="200">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="font-size" class="form-label">حجم الخط</label>
+                                    <select id="font-size" class="form-select">
+                                        <option value="12">صغير (12px)</option>
+                                        <option value="14" selected>متوسط (14px)</option>
+                                        <option value="16">كبير (16px)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="paper-size" class="form-label">حجم الورق</label>
+                                    <select id="paper-size" class="form-select">
+                                        <option value="A4">A4</option>
+                                        <option value="A5">A5</option>
+                                        <option value="Thermal">ورق حراري</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- حقول الفاتورة الإضافية -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">الحقول الإضافية في الفاتورة</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="show-barcode-in-invoice">
+                                <label class="form-check-label" for="show-barcode-in-invoice">
+                                    إظهار الباركود في الفاتورة
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="show-supplier-in-invoice">
+                                <label class="form-check-label" for="show-supplier-in-invoice">
+                                    إظهار المورد في الفاتورة
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="show-description-in-invoice" checked>
+                                <label class="form-check-label" for="show-description-in-invoice">
+                                    إظهار وصف المنتج في الفاتورة
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="save-pos-settings">
+                        <i class="bi bi-check-lg"></i> حفظ إعدادات نقطة البيع
+                    </button>
+                </div>
+
+                <!-- Tab: Notifications Settings -->
+                <div class="tab-pane fade" id="notifications-tab-pane" role="tabpanel" aria-labelledby="notifications-tab" tabindex="0">
+                    <h5>إعدادات الإشعارات</h5>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">تنبيهات داخل التطبيق</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-in-app-notifications" checked>
+                                <label class="form-check-label" for="enable-in-app-notifications">
+                                    تفعيل التنبيهات داخل التطبيق
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-sound-notifications">
+                                <label class="form-check-label" for="enable-sound-notifications">
+                                    تفعيل الأصوات للتنبيهات
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">إشعارات المتصفح</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-browser-notifications">
+                                <label class="form-check-label" for="enable-browser-notifications">
+                                    تفعيل إشعارات المتصفح
+                                </label>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>ملاحظة:</strong> إشعارات المتصفح تتطلب HTTPS أو localhost للعمل بشكل صحيح.
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" id="request-notification-permission">
+                                <i class="bi bi-bell"></i> طلب إذن الإشعارات
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">أنواع الإشعارات</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notify-product-added" checked>
+                                <label class="form-check-label" for="notify-product-added">
+                                    إشعار عند إضافة منتج جديد
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notify-product-updated" checked>
+                                <label class="form-check-label" for="notify-product-updated">
+                                    إشعار عند تحديث منتج
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notify-product-deleted" checked>
+                                <label class="form-check-label" for="notify-product-deleted">
+                                    إشعار عند حذف منتج
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notify-low-stock" checked>
+                                <label class="form-check-label" for="notify-low-stock">
+                                    إشعار عند انخفاض المخزون
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="save-notifications-settings">
+                        <i class="bi bi-check-lg"></i> حفظ إعدادات الإشعارات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Field Editor Modal (Needed for the Form Structure Editor) -->
+    <div class="modal fade" id="fieldEditorModal" tabindex="-1" aria-labelledby="fieldEditorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fieldEditorModalLabel">إضافة حقل جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="field-editor-form" novalidate>
+                        <input type="hidden" id="field-editor-main-cat">
+                        <input type="hidden" id="field-editor-field-index">
+                        <div class="mb-3"><label for="field-label" class="form-label">اسم الحقل (Label) <span class="text-danger">*</span></label><input type="text" id="field-label" class="form-control" required></div>
+                        <div class="mb-3"><label for="field-type" class="form-label">نوع الحقل</label><select id="field-type" class="form-select"><option value="text">نص</option><option value="textarea">نص متعدد الأسطر</option><option value="number">رقم</option><option value="date">تاريخ</option><option value="select">قائمة منسدلة</option><option value="radio">أزرار اختيار</option><option value="checkbox">صناديق اختيار</option><option value="file">رفع ملف</option></select></div>
+                        <div id="field-options-wrapper" class="p-3 border rounded bg-body-tertiary d-none"><h6 class="mb-3">خيارات القائمة</h6><ul id="field-options-list" class="list-group list-group-flush mb-2"></ul><div class="input-group"><input type="text" id="new-field-option-input" class="form-control" placeholder="إضافة خيار جديد..."><button id="add-field-option-btn" class="btn btn-outline-secondary" type="button">إضافة</button></div></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="save-field-btn">حفظ الحقل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+
+</html>

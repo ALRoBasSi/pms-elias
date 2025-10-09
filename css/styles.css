@@ -1,0 +1,177 @@
+/* --- إعدادات أساسية وخطوط --- */
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: var(--bs-body-bg);
+}
+
+/* --- متغيرات الوضع الداكن والفاتح --- */
+:root {
+    --bs-body-bg: #f8f9fa;
+    --bs-body-color: #212529;
+    --card-bg: #ffffff;
+    --card-border-color: rgba(0, 0, 0, 0.175);
+    --bs-tertiary-bg: #f8f9fa;
+    --bs-tertiary-border-color: #dee2e6;
+}
+
+[data-bs-theme="dark"] {
+    --bs-body-bg: #212529;
+    --bs-body-color: #dee2e6;
+    --card-bg: #343a40;
+    --card-border-color: rgba(255, 255, 255, 0.125);
+    --bs-tertiary-bg: #2b3035;
+    --bs-tertiary-border-color: #495057;
+}
+
+/* --- تحسينات على Bootstrap --- */
+.form-control, .form-select, .btn {
+    min-height: 44px; /* لسهولة اللمس على الجوال */
+    font-size: 1rem;
+}
+
+.modal-header .btn-close {
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+/* --- تصميم كارت المنتج --- */
+.product-card {
+    border: 1px solid var(--card-border-color);
+    background-color: var(--card-bg);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.product-card .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.product-card .card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.product-card .card-text {
+    font-size: 0.9rem;
+}
+
+.product-card .price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--bs-primary);
+    direction: ltr; /* لضمان عرض السعر والعملة بشكل صحيح */
+    text-align: right;
+}
+
+[data-bs-theme="dark"] .product-card .price {
+    color: var(--bs-info);
+}
+
+.product-card .card-footer {
+    background-color: transparent;
+    border-top: 1px solid var(--card-border-color);
+    padding-top: 0.75rem;
+    margin-top: auto; /* يدفع الفوتر لأسفل الكارت */
+}
+
+/* --- حاسبة السعر في شاشة التفاصيل --- */
+#meter-calculator {
+    background-color: var(--bs-tertiary-bg);
+    border-radius: 0.375rem;
+}
+
+#meter-calculator .total-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--bs-success);
+    direction: ltr;
+}
+
+/* --- تصميم أقسام النموذج --- */
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--card-border-color);
+}
+
+/* --- تحسينات على نموذج إضافة المنتج --- */
+#productModal .modal-body {
+    background-color: var(--bs-body-bg); /* Match body background */
+}
+
+.form-section {
+    background-color: var(--card-bg); /* Use card background for sections */
+    border: 1px solid var(--card-border-color);
+    padding: 1.5rem;
+    border-radius: .5rem;
+    margin-bottom: 1.5rem;
+}
+
+#product-form .form-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Override default h5 margin inside the new section */
+.form-section .form-section-title {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+}
+
+/* --- إعدادات مودال الإعدادات --- */
+#settingsModal .modal-dialog {
+    max-width: 900px; /* عرض أكبر للنافذة */
+}
+
+#settingsModal .modal-body {
+    min-height: 60vh; /* ارتفاع أدنى لضمان حجم ثابت */
+    max-height: 70vh; /* ارتفاع أقصى */
+    overflow-y: hidden; /* إخفاء التمرير من الجسم الرئيسي للنافذة */
+    display: flex;
+    flex-direction: column;
+    padding: 0; /* إزالة الحشوة للسماح بالتحكم الكامل */
+}
+
+#settingsModal .nav-tabs {
+    padding: 1rem 1rem 0 1rem;
+    border-bottom: 1px solid var(--card-border-color);
+    flex-shrink: 0; /* منع شريط التبويبات من التقلص */
+}
+
+#settingsModal .tab-content {
+    padding: 1.5rem;
+    overflow-y: auto; /* جعل محتوى التبويب فقط هو الذي يتم تمريره */
+    flex-grow: 1; /* السماح للمحتوى بملء المساحة المتبقية */
+}
+
+#settingsModal .nav-tabs .nav-link {
+    border-top-left-radius: .375rem;
+    border-top-right-radius: .375rem;
+}
+
+#settingsModal .nav-tabs .nav-link.active {
+    background-color: var(--bs-tertiary-bg);
+    border-color: var(--card-border-color) var(--card-border-color) transparent;
+}
+
+#structure-tab-pane .col-md-4 {
+    height: 100%;
+    max-height: calc(70vh - 150px); /* حساب الارتفاع مع الأخذ بالاعتبار حشوة المحتوى */
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+#fields-editor-container {
+    height: 100%;
+    max-height: calc(70vh - 150px); /* نفس الارتفاع */
+    overflow-y: auto;
+    padding-left: 1rem;
+}
