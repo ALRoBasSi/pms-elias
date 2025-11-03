@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>التقارير - محل الصدارة</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet"> -->
+     <link href="../css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    <!-- تم إزالة تحميل الخطوط من Google Fonts لاستخدام الخطوط المحلية -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> -->
+     <link rel="stylesheet" href="../css/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../css/styles.css">
-    <!-- Chart.js for advanced reporting -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
 </head>
 
 <body>
@@ -31,256 +33,69 @@
                         <a class="nav-link" href="../products/index.html">المنتجات</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../pos/index.html">نقطة البيع</a>
+                        <a class="nav-link active" aria-current="page" href="index.html">التقارير</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">التقارير</a>
+                        <a class="nav-link" href="../price-view/index.html">عرض سعر</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../settings/index.html">الإعدادات</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <button class="btn btn-outline-secondary me-2" id="theme-toggler" type="button">
-                        <i class="bi bi-moon-stars-fill"></i>
-                    </button>
+                    <!-- زر تغيير المظهر نُقل إلى صفحة الإعدادات -->
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="container-fluid my-4">
-        <!-- Dashboard Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="mb-1">لوحة التقارير والإحصائيات</h1>
-                <p class="text-muted mb-0">مراقبة شاملة لأداء المتجر والمبيعات</p>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" id="refresh-data-btn">
-                    <i class="bi bi-arrow-clockwise"></i> تحديث البيانات
-                </button>
-                <button class="btn btn-primary" id="export-dashboard-btn">
-                    <i class="bi bi-download"></i> تصدير التقرير
-                </button>
-            </div>
-        </div>
+    <main class="container my-4">
+        <h1 class="mb-4">التقارير والإحصائيات</h1>
 
-        <!-- Enhanced Summary Cards -->
+        <!-- Summary Cards -->
         <div class="row g-4 mb-4">
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
+            <div class="col-md-3">
+                <div class="card text-bg-primary text-white">
                     <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-primary bg-gradient rounded-3 p-3">
-                                    <i class="bi bi-cash-stack text-white fs-4"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small">إجمالي المبيعات</div>
-                                <div class="h4 mb-0 text-primary" id="total-sales">$0.00</div>
-                                <div class="text-success small" id="sales-change">
-                                    <i class="bi bi-arrow-up"></i> +0% من الأمس
-                                </div>
-                            </div>
-                        </div>
+                        <h5 class="card-title"><i class="bi bi-cash-stack"></i> إجمالي المبيعات</h5>
+                        <p class="card-text fs-4 fw-bold" id="total-sales">$0.00</p>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
+            <div class="col-md-3">
+                <div class="card text-bg-info text-white">
                     <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-info bg-gradient rounded-3 p-3">
-                                    <i class="bi bi-receipt text-white fs-4"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small">عدد الفواتير</div>
-                                <div class="h4 mb-0 text-info" id="invoice-count">0</div>
-                                <div class="text-success small" id="invoice-change">
-                                    <i class="bi bi-arrow-up"></i> +0 فاتورة اليوم
-                                </div>
-                            </div>
-                        </div>
+                        <h5 class="card-title"><i class="bi bi-receipt"></i> عدد الفواتير</h5>
+                        <p class="card-text fs-4 fw-bold" id="invoice-count">0</p>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
+            <div class="col-md-3">
+                <div class="card text-bg-secondary text-white">
                     <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-warning bg-gradient rounded-3 p-3">
-                                    <i class="bi bi-percent text-white fs-4"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small">إجمالي الضريبة</div>
-                                <div class="h4 mb-0 text-warning" id="total-tax">$0.00</div>
-                                <div class="text-muted small" id="tax-rate">نسبة 15%</div>
-                            </div>
-                        </div>
+                        <h5 class="card-title"><i class="bi bi-percent"></i> إجمالي الضريبة</h5>
+                        <p class="card-text fs-4 fw-bold" id="total-tax">$0.00</p>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
+            <div class="col-md-3">
+                <div class="card text-bg-success text-white">
                     <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success bg-gradient rounded-3 p-3">
-                                    <i class="bi bi-box text-white fs-4"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small">المنتجات المباعة</div>
-                                <div class="h4 mb-0 text-success" id="total-products">0</div>
-                                <div class="text-success small" id="products-change">
-                                    <i class="bi bi-arrow-up"></i> +0 قطعة اليوم
-                                </div>
-                            </div>
-                        </div>
+                        <h5 class="card-title"><i class="bi bi-box"></i> إجمالي المنتجات</h5>
+                        <p class="card-text fs-4 fw-bold" id="total-products">0</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="row g-4 mb-4">
-            <div class="col-xl-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-transparent border-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">مخطط المبيعات</h5>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <input type="radio" class="btn-check" name="chart-period" id="chart-7d" value="7d" checked>
-                                <label class="btn btn-outline-primary" for="chart-7d">7 أيام</label>
-                                <input type="radio" class="btn-check" name="chart-period" id="chart-30d" value="30d">
-                                <label class="btn btn-outline-primary" for="chart-30d">30 يوم</label>
-                                <input type="radio" class="btn-check" name="chart-period" id="chart-90d" value="90d">
-                                <label class="btn btn-outline-primary" for="chart-90d">90 يوم</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="salesChart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-transparent border-0">
-                        <h5 class="mb-0">أفضل المنتجات</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="topProductsChart" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Advanced Reports Section -->
-        <div class="row g-4 mb-4">
-            <!-- Sales Report -->
-            <div class="col-xl-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-transparent border-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">تقرير المبيعات التفصيلي</h5>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-funnel"></i> فلتر
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" data-period="today">اليوم</a></li>
-                                    <li><a class="dropdown-item" href="#" data-period="week">هذا الأسبوع</a></li>
-                                    <li><a class="dropdown-item" href="#" data-period="month">هذا الشهر</a></li>
-                                    <li><a class="dropdown-item" href="#" data-period="custom">فترة مخصصة</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>رقم الفاتورة</th>
-                                        <th>التاريخ</th>
-                                        <th>العميل</th>
-                                        <th class="text-end">المبلغ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="sales-report-table">
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">
-                                            <i class="bi bi-graph-down fs-1"></i>
-                                            <p class="mt-2">لا توجد بيانات للعرض</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top Products Report -->
-            <div class="col-xl-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-transparent border-0">
-                        <h5 class="mb-0">أفضل المنتجات مبيعاً</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>المنتج</th>
-                                        <th class="text-end">الكمية المباعة</th>
-                                        <th class="text-end">الإيرادات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="top-products-table">
-                                    <tr>
-                                        <td colspan="3" class="text-center text-muted py-4">
-                                            <i class="bi bi-box fs-1"></i>
-                                            <p class="mt-2">لا توجد بيانات للعرض</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Detailed Reports Section -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-transparent border-0">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">التقارير التفصيلية</h5>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-primary" id="export-pdf-btn">
-                            <i class="bi bi-file-pdf"></i> PDF
-                        </button>
-                        <button class="btn btn-sm btn-outline-success" id="export-excel-btn">
-                            <i class="bi bi-file-excel"></i> Excel
-                        </button>
-                        <button class="btn btn-sm btn-outline-info" id="export-csv-btn">
-                            <i class="bi bi-filetype-csv"></i> CSV
-                        </button>
-                    </div>
-                </div>
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">فلاتر التقارير</h5>
             </div>
             <div class="card-body">
-                <!-- Report Filters -->
-                <div class="row g-3 mb-4">
+                <div class="row g-3">
                     <div class="col-md-3">
                         <label for="report-type" class="form-label">نوع التقرير</label>
                         <select id="report-type" class="form-select">
@@ -288,8 +103,6 @@
                             <option value="top-products">أفضل المنتجات مبيعاً</option>
                             <option value="low-stock">المخزون المنخفض</option>
                             <option value="inventory-movement">حركة المخزون</option>
-                            <option value="customer-analysis">تحليل العملاء</option>
-                            <option value="profit-loss">تقرير الأرباح والخسائر</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -307,71 +120,109 @@
                         </select>
                     </div>
                 </div>
-
-                <!-- Report Actions -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-3">
-                        <button id="generate-report" class="btn btn-primary w-100">
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <button id="generate-report" class="btn btn-primary">
                             <i class="bi bi-search"></i> إنشاء التقرير
                         </button>
                     </div>
-                    <div class="col-md-3">
-                        <button id="print-report" class="btn btn-outline-secondary w-100">
+                    <div class="col-md-6 text-md-end">
+                        <button id="print-report" class="btn btn-outline-secondary">
                             <i class="bi bi-printer"></i> طباعة
                         </button>
                     </div>
-                    <div class="col-md-3">
-                        <button id="email-report" class="btn btn-outline-info w-100">
-                            <i class="bi bi-envelope"></i> إرسال بالإيميل
-                        </button>
-                    </div>
-                    <div class="col-md-3">
-                        <button id="schedule-report" class="btn btn-outline-warning w-100">
-                            <i class="bi bi-clock"></i> جدولة التقرير
-                        </button>
-                    </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Report Content -->
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-transparent border-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0" id="report-title">تقرير المبيعات</h5>
-                            <div class="text-muted" id="report-subtitle"></div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="reports-table" class="table table-striped table-hover">
-                                <thead id="reports-table-head">
-                                    <tr>
-                                        <th scope="col">رقم الفاتورة</th>
-                                        <th scope="col">التاريخ</th>
-                                        <th scope="col">العميل</th>
-                                        <th scope="col" class="text-end">عدد الأصناف</th>
-                                        <th scope="col" class="text-end">الإجمالي</th>
-                                        <th scope="col" class="text-center">الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="reports-table-body">
-                                    <!-- Report data will be injected here by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="no-report-data" class="text-center p-5" style="display: none;">
-                            <i class="bi bi-graph-down fs-1 text-muted"></i>
-                            <h4 class="mt-3">لا توجد بيانات للعرض</h4>
-                            <p class="text-muted">اختر فترة زمنية أو فلاتر مختلفة لعرض البيانات.</p>
-                        </div>
-                    </div>
+        <!-- Report Content -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" id="report-title">سجل الفواتير</h5>
+                <div class="text-muted" id="report-subtitle"></div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="reports-table" class="table table-striped table-hover">
+                        <thead id="reports-table-head">
+                            <tr>
+                                <th scope="col">رقم الفاتورة</th>
+                                <th scope="col">التاريخ</th>
+                                <th scope="col">العميل</th>
+                                <th scope="col" class="text-end">عدد الأصناف</th>
+                                <th scope="col" class="text-end">الإجمالي</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-table-body">
+                            <!-- Report data will be injected here by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-report-data" class="text-center p-5" style="display: none;">
+                    <i class="bi bi-graph-down fs-1 text-muted"></i>
+                    <h4 class="mt-3">لا توجد بيانات للعرض</h4>
+                    <p class="text-muted">اختر فترة زمنية أو فلاتر مختلفة لعرض البيانات.</p>
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
+    
+    <!-- Bottom Navbar for mobile -->
+    <nav class="bottom-nav d-block d-md-none bg-body-tertiary border-top">
+        <div class="container-fluid d-flex justify-content-between align-items-center py-2">
+            <a href="../products/index.html" class="text-center nav-item bottom-nav-item" id="bn-products">
+                <i class="bi bi-grid-fill fs-4"></i>
+                <div class="small">المنتجات</div>
+            </a>
+            <a href="index.html" class="text-center nav-item bottom-nav-item" id="bn-reports">
+                <i class="bi bi-bar-chart-fill fs-4"></i>
+                <div class="small">التقارير</div>
+            </a>
+
+            <a href="../products/index.html?add=1" class="btn btn-primary bottom-nav-add" id="bn-add" aria-label="إضافة منتج" title="إضافة منتج">
+                <i class="bi bi-plus-lg fs-4"></i>
+            </a>
+
+            <a href="../price-view/index.html" class="text-center nav-item bottom-nav-item" id="bn-price-view">
+                <i class="bi bi-currency-dollar fs-4"></i>
+                <div class="small">عرض سعر</div>
+            </a>
+            <a href="../settings/index.html" class="text-center nav-item bottom-nav-item" id="bn-settings">
+                <i class="bi bi-gear-fill fs-4"></i>
+                <div class="small">الإعدادات</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Barcode Scanner Modal (shared) -->
+    <div class="modal fade" id="barcodeScannerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">مسح الباركود</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <video id="barcode-video" playsinline style="width:100%;height:auto;border-radius:.5rem;display:none;"></video>
+                    <div id="barcode-fallback" class="mt-2">
+                        <p class="text-muted">المتصفح لا يدعم مسح الباركود تلقائياً. يمكنك إدخال الكود يدوياً أو رفع صورة للباركود.</p>
+                        <input type="text" id="barcode-manual-input" class="form-control mb-2" placeholder="أدخل أو ألصق رمز الباركود هنا">
+                        <input type="file" id="barcode-image-input" accept="image/*" class="form-control">
+                    </div>
+                    <div id="barcode-status" class="mt-2 text-muted small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-primary" id="barcode-scan-action">بحث عن المنتج</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/app.js"></script>
 </body>
 
 </html>
-

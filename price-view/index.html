@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض سعر - محل الصدارة</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+    <link href="../css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg sticky-top bg-body-tertiary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="../products/index.html">
+                <i class="bi bi-shop-window"></i>
+                محل الصدارة
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="main-navbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../products/index.html">المنتجات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../reports/index.html">التقارير</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../price-view/index.html">عرض سعر</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../settings/index.html">الإعدادات</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <!-- زر تغيير المظهر نُقل إلى صفحة الإعدادات -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-4">
+        <h1 class="mb-3">عرض سعر</h1>
+        <p class="text-muted">صفحة عرض السعر بسيطة تساعد على إدخال رمز المنتج (أو مسحه) وعرض السعر بسرعة.</p>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="pv-barcode-input" class="form-label">رمز المنتج / الباركود</label>
+                    <div class="input-group">
+                        <input id="pv-barcode-input" type="text" class="form-control" placeholder="أدخل أو امسح الباركود...">
+                        <button id="pv-search-btn" class="btn btn-primary">عرض السعر</button>
+                    </div>
+                </div>
+
+                <div id="pv-result" class="mt-3" style="display:none;">
+                    <h5>نتيجة البحث</h5>
+                    <div id="pv-result-body"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom navbar and scanner modal will be injected from shared markup (copied below) -->
+
+    <!-- Bottom Navbar for mobile -->
+    <nav class="bottom-nav d-block d-md-none bg-body-tertiary border-top">
+        <div class="container-fluid d-flex justify-content-between align-items-center py-2">
+            <a href="../products/index.html" class="text-center nav-item bottom-nav-item" id="bn-products">
+                <i class="bi bi-grid-fill fs-4"></i>
+                <div class="small">المنتجات</div>
+            </a>
+            <a href="../reports/index.html" class="text-center nav-item bottom-nav-item" id="bn-reports">
+                <i class="bi bi-bar-chart-fill fs-4"></i>
+                <div class="small">التقارير</div>
+            </a>
+
+                <a href="../products/index.html?add=1" class="btn btn-primary bottom-nav-add" id="bn-add" aria-label="إضافة منتج" title="إضافة منتج">
+                    <i class="bi bi-plus-lg fs-4"></i>
+                </a>
+
+            <a href="index.html" class="text-center nav-item bottom-nav-item" id="bn-price-view">
+                <i class="bi bi-currency-dollar fs-4"></i>
+                <div class="small">عرض سعر</div>
+            </a>
+            <a href="../settings/index.html" class="text-center nav-item bottom-nav-item" id="bn-settings">
+                <i class="bi bi-gear-fill fs-4"></i>
+                <div class="small">الإعدادات</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Barcode Scanner Modal (shared) -->
+    <div class="modal fade" id="barcodeScannerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">مسح الباركود</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <video id="barcode-video" playsinline style="width:100%;height:auto;border-radius:.5rem;display:none;"></video>
+                    <div id="barcode-fallback" class="mt-2">
+                        <p class="text-muted">المتصفح لا يدعم مسح الباركود تلقائياً. يمكنك إدخال الكود يدوياً أو رفع صورة للباركود.</p>
+                        <input type="text" id="barcode-manual-input" class="form-control mb-2" placeholder="أدخل أو ألصق رمز الباركود هنا">
+                        <input type="file" id="barcode-image-input" accept="image/*" class="form-control">
+                    </div>
+                    <div id="barcode-status" class="mt-2 text-muted small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-primary" id="barcode-scan-action">بحث عن المنتج</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+
+</html>

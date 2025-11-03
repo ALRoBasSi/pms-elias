@@ -5,8 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الإعدادات - محل الصدارة</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet"> -->
+     <link href="../css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    <!-- تم إزالة تحميل الخطوط من Google Fonts لاستخدام الخطوط المحلية -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> -->
+     <link rel="stylesheet" href="../css/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
@@ -28,412 +33,55 @@
                         <a class="nav-link" href="../products/index.html">المنتجات</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../pos/index.html">نقطة البيع</a>
+                        <a class="nav-link" href="../reports/index.html">التقارير</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../reports/index.html">التقارير</a>
+                        <a class="nav-link" href="../price-view/index.html">عرض سعر</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="index.html">الإعدادات</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <button class="btn btn-outline-secondary me-2" id="theme-toggler" type="button">
-                        <i class="bi bi-moon-stars-fill"></i>
-                    </button>
+                    <!-- زر تغيير المظهر أُزيل من الهيدر وتم إضافته داخل محتوى الإعدادات أدناه -->
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="container-fluid my-4">
-        <!-- Settings Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="mb-1">لوحة التحكم والإعدادات</h1>
-                <p class="text-muted mb-0">إدارة شاملة لجميع إعدادات النظام</p>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary" id="reset-settings-btn">
-                    <i class="bi bi-arrow-clockwise"></i> إعادة الإعدادات الافتراضية
-                </button>
-                <button class="btn btn-outline-primary" id="export-settings-btn">
-                    <i class="bi bi-download"></i> تصدير الإعدادات
-                </button>
-                <button class="btn btn-primary" id="save-all-settings-btn">
-                    <i class="bi bi-check-lg"></i> حفظ جميع الإعدادات
-                </button>
-            </div>
-        </div>
-
-        <!-- Settings Dashboard -->
-        <div class="row g-4 mb-4">
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="bg-primary bg-gradient rounded-3 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-shop text-white fs-4"></i>
-                        </div>
-                        <h6 class="mb-1">إعدادات المتجر</h6>
-                        <p class="text-muted small mb-0">معلومات المتجر الأساسية</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="bg-info bg-gradient rounded-3 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-printer text-white fs-4"></i>
-                        </div>
-                        <h6 class="mb-1">إعدادات الطباعة</h6>
-                        <p class="text-muted small mb-0">تخصيص الفواتير والطباعة</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="bg-success bg-gradient rounded-3 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-people text-white fs-4"></i>
-                        </div>
-                        <h6 class="mb-1">إدارة المستخدمين</h6>
-                        <p class="text-muted small mb-0">التحكم في الصلاحيات</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="bg-warning bg-gradient rounded-3 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-shield-check text-white fs-4"></i>
-                        </div>
-                        <h6 class="mb-1">النسخ الاحتياطية</h6>
-                        <p class="text-muted small mb-0">حفظ واستعادة البيانات</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    <main class="container my-4">
+        <h1>الإعدادات</h1>
         <div id="settings_content">
             <ul class="nav nav-tabs" id="settingsTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="general-settings-tab" data-bs-toggle="tab" data-bs-target="#general-settings-tab-pane" type="button" role="tab" aria-controls="general-settings-tab-pane" aria-selected="true">
-                        <i class="bi bi-gear"></i> الإعدادات العامة
-                    </button>
+                    <button class="nav-link active" id="structure-tab" data-bs-toggle="tab" data-bs-target="#structure-tab-pane" type="button" role="tab" aria-controls="structure-tab-pane" aria-selected="true">هيكلة النماذج</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="store-settings-tab" data-bs-toggle="tab" data-bs-target="#store-settings-tab-pane" type="button" role="tab" aria-controls="store-settings-tab-pane" aria-selected="false">
-                        <i class="bi bi-shop"></i> إعدادات المتجر
-                    </button>
+                    <button class="nav-link" id="brands-tab" data-bs-toggle="tab" data-bs-target="#brands-tab-pane" type="button" role="tab" aria-controls="brands-tab-pane" aria-selected="false">البراندات</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pos-settings-tab" data-bs-toggle="tab" data-bs-target="#pos-settings-tab-pane" type="button" role="tab" aria-controls="pos-settings-tab-pane" aria-selected="false">
-                        <i class="bi bi-cash-register"></i> نقطة البيع
-                    </button>
+                    <button class="nav-link" id="units-tab" data-bs-toggle="tab" data-bs-target="#units-tab-pane" type="button" role="tab" aria-controls="units-tab-pane" aria-selected="false">إدارة الوحدات</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="reports-settings-tab" data-bs-toggle="tab" data-bs-target="#reports-settings-tab-pane" type="button" role="tab" aria-controls="reports-settings-tab-pane" aria-selected="false">
-                        <i class="bi bi-graph-up"></i> التقارير
-                    </button>
+                    <button class="nav-link" id="reports-settings-tab" data-bs-toggle="tab" data-bs-target="#reports-settings-tab-pane" type="button" role="tab" aria-controls="reports-settings-tab-pane" aria-selected="false">إعدادات التقارير</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab" aria-controls="users-tab-pane" aria-selected="false">
-                        <i class="bi bi-people"></i> المستخدمين
-                    </button>
+                    <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-tab-pane" type="button" role="tab" aria-controls="notifications-tab-pane" aria-selected="false">الإشعارات</button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup-tab-pane" type="button" role="tab" aria-controls="backup-tab-pane" aria-selected="false">
-                        <i class="bi bi-shield-check"></i> النسخ الاحتياطية
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-tab-pane" type="button" role="tab" aria-controls="notifications-tab-pane" aria-selected="false">
-                        <i class="bi bi-bell"></i> الإشعارات
-                    </button>
-                </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data-tab-pane" type="button" role="tab" aria-controls="data-tab-pane" aria-selected="false">إدارة البيانات</button>
+                    </li>
             </ul>
             <div class="tab-content p-3 border border-top-0" id="settingsTabContent">
-                <!-- Tab: General Settings -->
-                <div class="tab-pane fade show active" id="general-settings-tab-pane" role="tabpanel" aria-labelledby="general-settings-tab" tabindex="0">
-                    <h5 class="mb-4">الإعدادات العامة للنظام</h5>
-                    
-                    <!-- System Information -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">معلومات النظام</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="system-name" class="form-label">اسم النظام</label>
-                                    <input type="text" id="system-name" class="form-control" value="نظام إدارة متجر الصدارة">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="system-version" class="form-label">إصدار النظام</label>
-                                    <input type="text" id="system-version" class="form-control" value="2.0.0" readonly>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="default-currency" class="form-label">العملة الافتراضية</label>
-                                    <select id="default-currency" class="form-select">
-                                        <option value="SAR">ريال سعودي (SAR)</option>
-                                        <option value="USD">دولار أمريكي (USD)</option>
-                                        <option value="EUR">يورو (EUR)</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="date-format" class="form-label">تنسيق التاريخ</label>
-                                    <select id="date-format" class="form-select">
-                                        <option value="DD/MM/YYYY">يوم/شهر/سنة</option>
-                                        <option value="MM/DD/YYYY">شهر/يوم/سنة</option>
-                                        <option value="YYYY-MM-DD">سنة-شهر-يوم</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="time-format" class="form-label">تنسيق الوقت</label>
-                                    <select id="time-format" class="form-select">
-                                        <option value="12">12 ساعة (AM/PM)</option>
-                                        <option value="24">24 ساعة</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="language" class="form-label">اللغة</label>
-                                    <select id="language" class="form-select">
-                                        <option value="ar">العربية</option>
-                                        <option value="en">English</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Theme Settings -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">إعدادات المظهر</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="theme-mode" class="form-label">وضع العرض</label>
-                                    <select id="theme-mode" class="form-select">
-                                        <option value="light">فاتح</option>
-                                        <option value="dark">داكن</option>
-                                        <option value="auto">تلقائي</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="primary-color" class="form-label">اللون الأساسي</label>
-                                    <input type="color" id="primary-color" class="form-control form-control-color" value="#0d6efd">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- زر تبديل الثيم داخل الإعدادات: متاح دائماً بغض النظر عن عرض الشاشة -->
+                <div class="mb-3 d-flex justify-content-end">
+                    <button id="theme-toggler-settings" class="btn btn-outline-secondary">
+                        <i class="bi bi-moon-stars-fill"></i> تبديل الوضع (فاتح/داكن)
+                    </button>
                 </div>
-
-                <!-- Tab: Store Settings -->
-                <div class="tab-pane fade" id="store-settings-tab-pane" role="tabpanel" aria-labelledby="store-settings-tab" tabindex="0">
-                    <h5 class="mb-4">إعدادات المتجر</h5>
-                    
-                    <!-- Store Information -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">معلومات المتجر</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="store-name" class="form-label">اسم المتجر</label>
-                                    <input type="text" id="store-name" class="form-control" value="محل الصدارة">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="store-phone" class="form-label">رقم الهاتف</label>
-                                    <input type="tel" id="store-phone" class="form-control" placeholder="+966xxxxxxxxx">
-                                </div>
-                                <div class="col-12">
-                                    <label for="store-address" class="form-label">عنوان المتجر</label>
-                                    <textarea id="store-address" class="form-control" rows="3" placeholder="العنوان الكامل للمتجر"></textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="store-email" class="form-label">البريد الإلكتروني</label>
-                                    <input type="email" id="store-email" class="form-control" placeholder="store@example.com">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="tax-number" class="form-label">الرقم الضريبي</label>
-                                    <input type="text" id="tax-number" class="form-control" placeholder="رقم السجل التجاري">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Store Logo -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">شعار المتجر</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <div class="border rounded p-3 text-center" style="height: 150px;">
-                                        <img id="store-logo-preview" src="" alt="شعار المتجر" class="img-fluid" style="max-height: 100%; display: none;">
-                                        <div id="no-logo-placeholder" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
-                                            <i class="bi bi-image fs-1"></i>
-                                            <small>لم يتم رفع شعار</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="store-logo" class="form-label">رفع شعار المتجر</label>
-                                    <input type="file" id="store-logo" class="form-control" accept="image/*">
-                                    <small class="text-muted">الأحجام المقبولة: JPG, PNG, GIF (أقصى حجم: 2MB)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab: Users Management -->
-                <div class="tab-pane fade" id="users-tab-pane" role="tabpanel" aria-labelledby="users-tab" tabindex="0">
-                    <h5 class="mb-4">إدارة المستخدمين</h5>
-                    
-                    <!-- Add New User -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">إضافة مستخدم جديد</h6>
-                        </div>
-                        <div class="card-body">
-                            <form id="user-form">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="user-name" class="form-label">اسم المستخدم</label>
-                                        <input type="text" id="user-name" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="user-email" class="form-label">البريد الإلكتروني</label>
-                                        <input type="email" id="user-email" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="user-role" class="form-label">الدور</label>
-                                        <select id="user-role" class="form-select" required>
-                                            <option value="admin">مدير</option>
-                                            <option value="cashier">بائع</option>
-                                            <option value="viewer">مراقب</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="user-password" class="form-label">كلمة المرور</label>
-                                        <input type="password" id="user-password" class="form-control" required>
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-person-plus"></i> إضافة مستخدم
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Users List -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0">قائمة المستخدمين</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>الاسم</th>
-                                            <th>البريد الإلكتروني</th>
-                                            <th>الدور</th>
-                                            <th>آخر دخول</th>
-                                            <th class="text-center">الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="users-table">
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted py-4">
-                                                <i class="bi bi-people fs-1"></i>
-                                                <p class="mt-2">لا يوجد مستخدمين</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab: Backup & Restore -->
-                <div class="tab-pane fade" id="backup-tab-pane" role="tabpanel" aria-labelledby="backup-tab" tabindex="0">
-                    <h5 class="mb-4">النسخ الاحتياطية</h5>
-                    
-                    <!-- Backup Actions -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body text-center">
-                                    <div class="bg-primary bg-gradient rounded-3 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
-                                        <i class="bi bi-download text-white fs-4"></i>
-                                    </div>
-                                    <h6 class="mb-2">تصدير البيانات</h6>
-                                    <p class="text-muted small mb-3">حفظ نسخة احتياطية من جميع البيانات</p>
-                                    <button class="btn btn-primary" id="export-backup-btn">
-                                        <i class="bi bi-download"></i> تصدير الآن
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body text-center">
-                                    <div class="bg-success bg-gradient rounded-3 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
-                                        <i class="bi bi-upload text-white fs-4"></i>
-                                    </div>
-                                    <h6 class="mb-2">استيراد البيانات</h6>
-                                    <p class="text-muted small mb-3">استعادة البيانات من نسخة احتياطية</p>
-                                    <input type="file" id="import-backup" class="form-control" accept=".json" style="display: none;">
-                                    <button class="btn btn-success" id="import-backup-btn">
-                                        <i class="bi bi-upload"></i> استيراد
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Backup History -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0">تاريخ النسخ الاحتياطية</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>اسم الملف</th>
-                                            <th>تاريخ الإنشاء</th>
-                                            <th>حجم الملف</th>
-                                            <th class="text-center">الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="backup-history-table">
-                                        <tr>
-                                            <td colspan="4" class="text-center text-muted py-4">
-                                                <i class="bi bi-archive fs-1"></i>
-                                                <p class="mt-2">لا توجد نسخ احتياطية</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Tab: Form Structure Editor -->
-                <div class="tab-pane fade" id="structure-tab-pane" role="tabpanel" aria-labelledby="structure-tab" tabindex="0">
+                <div class="tab-pane fade show active" id="structure-tab-pane" role="tabpanel" aria-labelledby="structure-tab" tabindex="0">
                     <div class="row">
                         <div class="col-md-4 border-end">
                             <h6 class="mb-3">الفئات الرئيسية</h6>
@@ -559,130 +207,7 @@
                     </button>
                 </div>
 
-                <!-- Tab: POS Settings -->
-                <div class="tab-pane fade" id="pos-settings-tab-pane" role="tabpanel" aria-labelledby="pos-settings-tab" tabindex="0">
-                    <h5>إعدادات نقطة البيع</h5>
-                    
-                    <!-- إعدادات الفاتورة -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">إعدادات الفاتورة</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="store-name" class="form-label">اسم المتجر</label>
-                                    <input type="text" id="store-name" class="form-control" value="محل الصدارة">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="store-address" class="form-label">عنوان المتجر</label>
-                                    <input type="text" id="store-address" class="form-control" placeholder="العنوان الكامل">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="store-phone" class="form-label">رقم الهاتف</label>
-                                    <input type="tel" id="store-phone" class="form-control" placeholder="+966xxxxxxxxx">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="tax-rate" class="form-label">نسبة الضريبة (%)</label>
-                                    <input type="number" id="tax-rate" class="form-control" value="15" min="0" max="100" step="0.1">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- إعدادات ترقيم الفواتير -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">ترقيم الفواتير</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="invoice-prefix" class="form-label">بادئة الفاتورة</label>
-                                    <input type="text" id="invoice-prefix" class="form-control" value="INV" maxlength="10">
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="invoice-digits" class="form-label">عدد الأرقام</label>
-                                    <input type="number" id="invoice-digits" class="form-control" value="6" min="3" max="10">
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="invoice-start" class="form-label">رقم البداية</label>
-                                    <input type="number" id="invoice-start" class="form-control" value="1" min="1">
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="auto-reset-invoice" checked>
-                                    <label class="form-check-label" for="auto-reset-invoice">
-                                        إعادة تعيين رقم الفاتورة شهرياً
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- إعدادات الطباعة -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">إعدادات الطباعة</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="print-width" class="form-label">عرض الطباعة (مم)</label>
-                                    <input type="number" id="print-width" class="form-control" value="80" min="50" max="200">
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="font-size" class="form-label">حجم الخط</label>
-                                    <select id="font-size" class="form-select">
-                                        <option value="12">صغير (12px)</option>
-                                        <option value="14" selected>متوسط (14px)</option>
-                                        <option value="16">كبير (16px)</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="paper-size" class="form-label">حجم الورق</label>
-                                    <select id="paper-size" class="form-select">
-                                        <option value="A4">A4</option>
-                                        <option value="A5">A5</option>
-                                        <option value="Thermal">ورق حراري</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- حقول الفاتورة الإضافية -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">الحقول الإضافية في الفاتورة</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="show-barcode-in-invoice">
-                                <label class="form-check-label" for="show-barcode-in-invoice">
-                                    إظهار الباركود في الفاتورة
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="show-supplier-in-invoice">
-                                <label class="form-check-label" for="show-supplier-in-invoice">
-                                    إظهار المورد في الفاتورة
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="show-description-in-invoice" checked>
-                                <label class="form-check-label" for="show-description-in-invoice">
-                                    إظهار وصف المنتج في الفاتورة
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn btn-primary" id="save-pos-settings">
-                        <i class="bi bi-check-lg"></i> حفظ إعدادات نقطة البيع
-                    </button>
-                </div>
 
                 <!-- Tab: Notifications Settings -->
                 <div class="tab-pane fade" id="notifications-tab-pane" role="tabpanel" aria-labelledby="notifications-tab" tabindex="0">
@@ -707,7 +232,7 @@
                             </div>
                         </div>
                     </div>
-
+                
                     <div class="card mb-4">
                         <div class="card-header">
                             <h6 class="mb-0">إشعارات المتصفح</h6>
@@ -765,6 +290,28 @@
                         <i class="bi bi-check-lg"></i> حفظ إعدادات الإشعارات
                     </button>
                 </div>
+                <!-- Tab: Data Management -->
+                <div class="tab-pane fade" id="data-tab-pane" role="tabpanel" aria-labelledby="data-tab" tabindex="0">
+                    <h5>إدارة البيانات (استيراد / تصدير)</h5>
+                    <p class="text-muted">استيراد وتصدير بيانات المنتجات بصيغ JSON أو CSV. تأكد من أن ملف JSON مُنسق حسب بنية التطبيق.</p>
+
+                    <!-- Hidden file input for JSON import -->
+                    <input type="file" id="import-json" accept="application/json" style="display:none">
+
+                    <div class="mb-3 d-flex gap-2">
+                        <button type="button" id="import-json-btn" class="btn btn-outline-primary">
+                            <i class="bi bi-file-earmark-arrow-up"></i> استيراد (JSON)
+                        </button>
+                        <button type="button" id="export-json" class="btn btn-outline-success">
+                            <i class="bi bi-file-earmark-arrow-down"></i> تصدير (JSON)
+                        </button>
+                        <button type="button" id="export-csv" class="btn btn-outline-success">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> تصدير (CSV)
+                        </button>
+                    </div>
+
+                    <div id="data-management-result" class="mt-3"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -794,7 +341,61 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
+    
+    <!-- Bottom Navbar for mobile -->
+    <nav class="bottom-nav d-block d-md-none bg-body-tertiary border-top">
+        <div class="container-fluid d-flex justify-content-between align-items-center py-2">
+            <a href="../products/index.html" class="text-center nav-item bottom-nav-item" id="bn-products">
+                <i class="bi bi-grid-fill fs-4"></i>
+                <div class="small">المنتجات</div>
+            </a>
+            <a href="../reports/index.html" class="text-center nav-item bottom-nav-item" id="bn-reports">
+                <i class="bi bi-bar-chart-fill fs-4"></i>
+                <div class="small">التقارير</div>
+            </a>
+
+            <a href="../products/index.html?add=1" class="btn btn-primary bottom-nav-add" id="bn-add" aria-label="إضافة منتج" title="إضافة منتج">
+                <i class="bi bi-plus-lg fs-4"></i>
+            </a>
+
+            <a href="../price-view/index.html" class="text-center nav-item bottom-nav-item" id="bn-price-view">
+                <i class="bi bi-currency-dollar fs-4"></i>
+                <div class="small">عرض سعر</div>
+            </a>
+            <a href="index.html" class="text-center nav-item bottom-nav-item" id="bn-settings">
+                <i class="bi bi-gear-fill fs-4"></i>
+                <div class="small">الإعدادات</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Barcode Scanner Modal (shared) -->
+    <div class="modal fade" id="barcodeScannerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">مسح الباركود</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <video id="barcode-video" playsinline style="width:100%;height:auto;border-radius:.5rem;display:none;"></video>
+                    <div id="barcode-fallback" class="mt-2">
+                        <p class="text-muted">المتصفح لا يدعم مسح الباركود تلقائياً. يمكنك إدخال الكود يدوياً أو رفع صورة للباركود.</p>
+                        <input type="text" id="barcode-manual-input" class="form-control mb-2" placeholder="أدخل أو ألصق رمز الباركود هنا">
+                        <input type="file" id="barcode-image-input" accept="image/*" class="form-control">
+                    </div>
+                    <div id="barcode-status" class="mt-2 text-muted small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-primary" id="barcode-scan-action">بحث عن المنتج</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/app.js"></script>
 </body>
 

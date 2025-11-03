@@ -4,21 +4,24 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ===============================================================================
-    // 1. طبقة قاعدة البيانات المتقدمة (Advanced IndexedDB Wrapper)
-    //    - نظام قاعدة بيانات متطور مع دعم النسخ الاحتياطية
-    //    - نظام تنبيهات داخلي متقدم
-    //    - إدارة المستخدمين والصلاحيات
-    //    - نظام سجل العمليات المتقدم
+    // 1. طبقة قاعدة البيانات (IndexedDB Wrapper)
+    //    - هذا الجزء معزول للتعامل مع قاعدة البيانات المحلية.
+    //    - يمكن استبداله بسهولة بـ API calls في المستقبل.
+    //    - لماذا IndexedDB وليس localStorage؟
+    //      - IndexedDB مصمم لتخزين كميات كبيرة من البيانات المنظمة (مثل منتجاتنا).
+    //      - يعمل بشكل غير متزامن (Asynchronous)، فلا يعطل واجهة المستخدم.
+    //      - يدعم الفهرسة، مما يجعل البحث سريعاً جداً.
+    //      - localStorage بسيط لكنه محدود السعة، متزامن (يُبطئ التطبيق)، ويخزن نصوص فقط.
     // ===============================================================================
     const dbManager = {
         db: null,
         dbName: 'SadarahStoreDB',
         storeName: 'products',
-        version: 8, // إصدار جديد مع ميزات متقدمة
 
         open() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open(this.dbName, this.version);
+                // زيادة رقم الإصدار للسماح بالترقية
+                const request = indexedDB.open(this.dbName, 8); // <-- زيادة الإصدار إلى 8
 
                 request.onupgradeneeded = (event) => {
                     this.db = event.target.result;
@@ -54,40 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         // اسم البراند يجب أن يكون فريداً
                         brandStore.createIndex('name', 'name', { unique: true });
                     }
-                    // إنشاء جدول الفواتير الجديد في الإصدار 7
-                    if (!this.db.objectStoreNames.contains('invoices')) {
-                        const invoiceStore = this.db.createObjectStore('invoices', { keyPath: 'id' });
-                        invoiceStore.createIndex('date', 'date', { unique: false });
-                        invoiceStore.createIndex('customer', 'customerName', { unique: false });
-                        invoiceStore.createIndex('total', 'total', { unique: false });
-                    }
-                    
-                    // إنشاء جدول المستخدمين في الإصدار 8
-                    if (!this.db.objectStoreNames.contains('users')) {
-                        const userStore = this.db.createObjectStore('users', { keyPath: 'id' });
-                        userStore.createIndex('email', 'email', { unique: true });
-                        userStore.createIndex('role', 'role', { unique: false });
-                    }
-                    
-                    // إنشاء جدول النسخ الاحتياطية في الإصدار 8
-                    if (!this.db.objectStoreNames.contains('backups')) {
-                        const backupStore = this.db.createObjectStore('backups', { keyPath: 'id' });
-                        backupStore.createIndex('date', 'createdAt', { unique: false });
-                        backupStore.createIndex('type', 'type', { unique: false });
-                    }
-                    
-                    // إنشاء جدول إعدادات النظام في الإصدار 8
-                    if (!this.db.objectStoreNames.contains('systemSettings')) {
-                        this.db.createObjectStore('systemSettings', { keyPath: 'key' });
-                    }
-                    
-                    // إنشاء جدول سجل العمليات المتقدم في الإصدار 8
-                    if (!this.db.objectStoreNames.contains('auditLogs')) {
-                        const auditStore = this.db.createObjectStore('auditLogs', { keyPath: 'id' });
-                        auditStore.createIndex('timestamp', 'timestamp', { unique: false });
-                        auditStore.createIndex('operation', 'operation', { unique: false });
-                        auditStore.createIndex('userId', 'userId', { unique: false });
-                    }
                 };
 
                 request.onsuccess = (event) => {
@@ -96,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 request.onerror = (event) => {
-                    console.error('DB Error:', event.target.errorCode);
-                    reject(event.target.errorCode);
+                    console.error('DB Error:', event.target.error);
+                    reject(event.target.error);
                 };
             });
         },
@@ -265,64 +234,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        // --- دوال CRUD للفواتير ---
-        addInvoice(invoice) {
-            return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction('invoices', 'readwrite');
-                const store = transaction.objectStore('invoices');
-                const request = store.add(invoice);
-                request.onsuccess = () => resolve(invoice);
-                request.onerror = (e) => reject(e.target.error);
-            });
-        },
 
-        getAllInvoices() {
-            return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction('invoices', 'readonly');
-                const store = transaction.objectStore('invoices');
-                const request = store.getAll();
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = (e) => reject(e.target.error);
-            });
-        }
     };
 
     // ===============================================================================
     // 2. نظام التنبيهات والإشعارات
     // ===============================================================================
     const notificationSystem = {
-        // إعدادات الإشعارات المتقدمة
+        // إعدادات الإشعارات
         settings: {
             inAppNotifications: true,
             browserNotifications: false,
-            soundEnabled: false,
-            autoHide: true,
-            position: 'top-end',
-            maxNotifications: 5,
-            priority: 'normal'
+            soundEnabled: false
         },
-        
-        // متغيرات النظام
-        browserSupport: false,
-        permission: 'default',
-        activeNotifications: [],
 
         // تهيئة النظام
         init() {
             this.loadSettings();
             this.checkBrowserNotificationSupport();
-            this.setupNotificationContainer();
-        },
-
-        // إعداد حاوية التنبيهات
-        setupNotificationContainer() {
-            if (!document.getElementById('toast-container')) {
-                const container = document.createElement('div');
-                container.id = 'toast-container';
-                container.className = `toast-container position-fixed ${this.settings.position} p-3`;
-                container.style.zIndex = '9999';
-                document.body.appendChild(container);
-            }
         },
 
         // تحميل الإعدادات من localStorage
@@ -452,62 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSettings(newSettings) {
             this.settings = { ...this.settings, ...newSettings };
             this.saveSettings();
-        },
-
-        // إشعارات متخصصة للنظام
-        showSuccess(message, duration = 3000) {
-            this.showInAppNotification(message, 'success', duration);
-        },
-
-        showError(message, duration = 5000) {
-            this.showInAppNotification(message, 'error', duration);
-        },
-
-        showWarning(message, duration = 4000) {
-            this.showInAppNotification(message, 'warning', duration);
-        },
-
-        showInfo(message, duration = 3000) {
-            this.showInAppNotification(message, 'info', duration);
-        },
-
-        // تنظيف الإشعارات القديمة
-        cleanupOldNotifications() {
-            if (this.activeNotifications.length >= this.settings.maxNotifications) {
-                const oldest = this.activeNotifications.shift();
-                if (oldest && oldest.element) {
-                    const toast = bootstrap.Toast.getInstance(oldest.element);
-                    if (toast) {
-                        toast.hide();
-                    }
-                }
-            }
-        },
-
-        // إزالة إشعار من القائمة النشطة
-        removeNotification(toastId) {
-            this.activeNotifications = this.activeNotifications.filter(n => n.id !== toastId);
-        },
-
-        // تشغيل صوت التنبيه
-        playNotificationSound(type) {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.5);
-            } catch (error) {
-                console.warn('لا يمكن تشغيل الصوت:', error);
-            }
         }
     };
 
@@ -632,44 +505,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // دالة بدء تشغيل التطبيق
         async init() {
-            // 1. العمليات المشتركة بين كل الصفحات
-            await dbManager.open();
-            this.applyTheme(this.getSavedTheme());
-            
-            // تهيئة نظام التنبيهات
-            notificationSystem.init();
-            
-            // ربط الأحداث العامة مثل زر تغيير الثيم
-            const themeToggler = document.getElementById('theme-toggler');
-            if (themeToggler) {
-                themeToggler.addEventListener('click', () => this.toggleTheme());
-            }
+            try {
+                // 1. العمليات المشتركة بين كل الصفحات
+                await dbManager.open();
+                this.applyTheme(this.getSavedTheme());
+                
+                // تهيئة نظام التنبيهات
+                notificationSystem.init();
+                
+                // ربط الأحداث العامة مثل زر تغيير الثيم
+                // الآن نبحث عن الزر داخل الهيدر أو داخل صفحة الإعدادات (id: theme-toggler-settings)
+                const themeToggler = document.getElementById('theme-toggler') || document.getElementById('theme-toggler-settings');
+                if (themeToggler) {
+                    themeToggler.addEventListener('click', () => this.toggleTheme());
+                }
 
-            // 2. التحقق من وجود بيانات أولية وإنشائها إن لم تكن موجودة
-            const products = await dbManager.getAll();
-            const units = await dbManager.getAllUnits();
-            const structure = await dbManager.getFormStructure('main');
-            if (!structure || (products.length === 0 && units.length === 0)) {
-                await this.seedData();
-            }
-            
-            // 3. تحميل البيانات الأساسية المشتركة
-            await this.loadFormStructure();
-            await this.loadInitialData();
+                // 2. التحقق من وجود بيانات أولية وإنشائها إن لم تكن موجودة
+                const products = await dbManager.getAll();
+                const units = await dbManager.getAllUnits();
+                const structure = await dbManager.getFormStructure('main');
+                if (!structure || (products.length === 0 && units.length === 0)) {
+                    await this.seedData();
+                }
+                
+                // 3. تحميل البيانات الأساسية المشتركة
+                await this.loadFormStructure();
+                await this.loadInitialData();
 
-
-            // 4. تشغيل الكود المخصص للصفحة الحالية
-            if (document.getElementById('products-grid')) {
-                this.initProductsPage();
-            }
-            if (document.getElementById('settings_content')) {
-                this.initSettingsPage();
-            }
-            if (document.getElementById('pos-products-grid')) {
-                this.initPosPage();
-            }
-            if (document.getElementById('reports-table')) {
-                this.initReportsPage();
+                // 4. تشغيل الكود المخصص للصفحة الحالية
+                if (document.getElementById('products-grid')) {
+                    this.initProductsPage();
+                }
+                if (document.getElementById('settings_content')) {
+                    this.initSettingsPage();
+                }
+            } catch (error) {
+                console.error('خطأ في تهيئة التطبيق:', error);
+                // عرض رسالة خطأ للمستخدم
+                if (typeof notificationSystem !== 'undefined') {
+                    notificationSystem.showInAppNotification(
+                        'حدث خطأ في تحميل التطبيق. يرجى إعادة تحميل الصفحة.',
+                        'error',
+                        10000
+                    );
+                }
             }
         },
         
@@ -691,6 +570,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 categoryFilter: document.getElementById('filter-category'),
                 brandFilter: document.getElementById('filter-brand'),
                 sortBy: document.getElementById('sort-by'),
+                viewGridBtn: document.getElementById('view-grid-btn'),
+                viewListBtn: document.getElementById('view-list-btn'),
+                toolbarBarcodeBtn: document.getElementById('toolbar-barcode-btn'),
                 productModal: document.getElementById('productModal') ? new bootstrap.Modal(document.getElementById('productModal')) : null,
                 productForm: document.getElementById('product-form'),
                 productModalLabel: document.getElementById('productModalLabel'),
@@ -707,6 +589,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // ب. ربط الأحداث الخاصة بصفحة المنتجات
             this.bindProductsPageEvents();
+
+            // الوضع الافتراضي لعرض المنتجات (grid | list)
+            this.state.viewMode = this.state.viewMode || 'grid';
             
             // ج. تهيئة وعرض المحتوى
             if (this.state.formStructure && this.state.formStructure.config) {
@@ -715,6 +600,39 @@ document.addEventListener('DOMContentLoaded', () => {
             this.populateFilters();
             this.populateBrandDropdown(); // للتأكد من ملء قائمة البراندات في نموذج الإضافة
             this.filterAndRender(); // العرض الأولي للمنتجات
+        },
+
+        // تغيير وضع العرض (grid أو list)
+        setViewMode(mode) {
+            if (!['grid', 'list'].includes(mode)) return;
+            this.state.viewMode = mode;
+            // تبديل الحالة البصرية للأزرار إن كانت موجودة
+            if (this.elements.viewGridBtn && this.elements.viewListBtn) {
+                if (mode === 'grid') {
+                    this.elements.viewGridBtn.classList.add('active');
+                    this.elements.viewListBtn.classList.remove('active');
+                } else {
+                    this.elements.viewGridBtn.classList.remove('active');
+                    this.elements.viewListBtn.classList.add('active');
+                }
+            }
+            this.filterAndRender();
+        },
+
+        // البحث عن منتجات بواسطة الباركود (مطابقة دقيقة ثم جزئية)
+        findProductsByBarcode(value) {
+            if (!value) return [];
+            const v = value.toString().trim();
+            if (!v) return [];
+            return (this.state.allProducts || []).filter(p => {
+                if (!p) return false;
+                if (p.barcode && p.barcode.toString() === v) return true;
+                if (p.barcode && p.barcode.toString().includes(v)) return true;
+                // fallback: check sku/serial
+                if (p.sku && p.sku.toString().includes(v)) return true;
+                if (p.serial_number && p.serial_number.toString().includes(v)) return true;
+                return false;
+            });
         },
 
         // تهيئة صفحة الإعدادات
@@ -860,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async generateSalesReport(dateFrom, dateTo, category) {
-            const invoices = await dbManager.getAllInvoices();
+            const invoices = [];
             
             // فلترة الفواتير حسب التاريخ والفئة
             let filteredInvoices = invoices.filter(invoice => {
@@ -909,7 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async generateTopProductsReport(dateFrom, dateTo, category) {
-            const invoices = await dbManager.getAllInvoices();
+            const invoices = [];
             
             // فلترة الفواتير حسب التاريخ
             let filteredInvoices = invoices.filter(invoice => {
@@ -1262,41 +1180,117 @@ document.addEventListener('DOMContentLoaded', () => {
         // ربط الأحداث الخاصة بصفحة المنتجات
         bindProductsPageEvents() {
             const debouncedSearch = utils.debounce(() => this.filterAndRender(), 300);
-            this.elements.searchInput.addEventListener('input', debouncedSearch);
-            this.elements.categoryFilter.addEventListener('change', () => this.filterAndRender());
-            this.elements.brandFilter.addEventListener('change', () => this.filterAndRender());
-            this.elements.sortBy.addEventListener('change', () => this.filterAndRender());
-            this.elements.productForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
-            
-            this.elements.importJsonBtn.addEventListener('change', (e) => this.handleImport(e));
-            this.elements.exportJsonBtn.addEventListener('click', () => this.handleExport('json'));
-            this.elements.exportCsvBtn.addEventListener('click', () => this.handleExport('csv'));
+            if (this.elements.searchInput) {
+                this.elements.searchInput.addEventListener('input', debouncedSearch);
+            }
+            if (this.elements.categoryFilter) {
+                this.elements.categoryFilter.addEventListener('change', () => this.filterAndRender());
+            }
+            if (this.elements.brandFilter) {
+                this.elements.brandFilter.addEventListener('change', () => this.filterAndRender());
+            }
+            if (this.elements.sortBy) {
+                this.elements.sortBy.addEventListener('change', () => this.filterAndRender());
+            }
+            if (this.elements.productForm) {
+                this.elements.productForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
+            }
 
-            document.getElementById('productModal').addEventListener('hidden.bs.modal', () => {
-                this.resetForm();
-            });
-            
-            // إعادة تعيين النموذج عند فتح المودال
-            document.getElementById('productModal').addEventListener('show.bs.modal', () => {
-                // التأكد من أن البيانات محملة قبل إعادة تعيين النموذج
-                if (this.state.formStructure && this.state.formStructure.config) {
+            if (this.elements.importJsonBtn) {
+                this.elements.importJsonBtn.addEventListener('change', (e) => this.handleImport(e));
+            }
+            if (this.elements.exportJsonBtn) {
+                this.elements.exportJsonBtn.addEventListener('click', () => this.handleExport('json'));
+            }
+            if (this.elements.exportCsvBtn) {
+                this.elements.exportCsvBtn.addEventListener('click', () => this.handleExport('csv'));
+            }
+
+            // زر داخل الصفحة لاستدعاء حقل الملف المخفي (قد يكون في Settings)
+            const importJsonTrigger = document.getElementById('import-json-btn');
+            if (importJsonTrigger) {
+                importJsonTrigger.addEventListener('click', () => {
+                    const fileInput = document.getElementById('import-json');
+                    if (fileInput) fileInput.click();
+                });
+            }
+
+            // عرض الشبكة/القائمة
+            if (this.elements.viewGridBtn) {
+                this.elements.viewGridBtn.addEventListener('click', () => this.setViewMode('grid'));
+            }
+            if (this.elements.viewListBtn) {
+                this.elements.viewListBtn.addEventListener('click', () => this.setViewMode('list'));
+            }
+            // زر شريط الأدوات لفتح مودال مسح الباركود
+            if (this.elements.toolbarBarcodeBtn) {
+                this.elements.toolbarBarcodeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const modalEl = document.getElementById('barcodeScannerModal');
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                    // ابدأ المسح إن كانت الكاميرا مدعومة
+                    try { startBarcodeScan(); } catch (err) { console.warn('startBarcodeScan error', err); }
+                });
+            }
+
+            const productModalEl = document.getElementById('productModal');
+            if (productModalEl) {
+                productModalEl.addEventListener('hidden.bs.modal', () => {
                     this.resetForm();
-                }
-            });
+                });
+
+                productModalEl.addEventListener('show.bs.modal', (event) => {
+                    const productIdInput = document.getElementById('product-id');
+                    if (!productIdInput || !productIdInput.value) {
+                        if (this.state.formStructure && this.state.formStructure.config) {
+                            this.resetForm();
+                        }
+                    }
+                });
+            }
         },
 
         // ربط الأحداث الخاصة بصفحة الإعدادات
         bindSettingsPageEvents() {
-            this.elements.brandForm.addEventListener('submit', (e) => this.handleBrandFormSubmit(e));
-            this.elements.cancelBrandEditBtn.addEventListener('click', () => this.resetBrandForm());
+            if (this.elements.brandForm) {
+                this.elements.brandForm.addEventListener('submit', (e) => this.handleBrandFormSubmit(e));
+            }
+            if (this.elements.cancelBrandEditBtn) {
+                this.elements.cancelBrandEditBtn.addEventListener('click', () => this.resetBrandForm());
+            }
 
-            this.elements.unitForm.addEventListener('submit', (e) => this.handleUnitFormSubmit(e));
-            this.elements.cancelUnitEditBtn.addEventListener('click', () => this.resetUnitForm());
-            
+            if (this.elements.unitForm) {
+                this.elements.unitForm.addEventListener('submit', (e) => this.handleUnitFormSubmit(e));
+            }
+            if (this.elements.cancelUnitEditBtn) {
+                this.elements.cancelUnitEditBtn.addEventListener('click', () => this.resetUnitForm());
+            }
+
+            // ربط عناصر الاستيراد/التصدير الموجودة داخل تبويب إدارة البيانات
+            const importTrigger = document.getElementById('import-json-btn');
+            const importInput = document.getElementById('import-json');
+            const exportJson = document.getElementById('export-json');
+            const exportCsv = document.getElementById('export-csv');
+
+            if (importTrigger) {
+                importTrigger.addEventListener('click', () => {
+                    if (importInput) importInput.click();
+                });
+            }
+            if (importInput) {
+                importInput.addEventListener('change', (e) => this.handleImport(e));
+            }
+            if (exportJson) {
+                exportJson.addEventListener('click', () => this.handleExport('json'));
+            }
+            if (exportCsv) {
+                exportCsv.addEventListener('click', () => this.handleExport('csv'));
+            }
+
             // أحداث الإعدادات الجديدة
             this.bindNotificationsSettings();
             this.bindReportsSettings();
-            this.bindPosSettings();
         },
 
         // تحميل المنتجات من قاعدة البيانات وعرضها
@@ -1308,12 +1302,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // تعبئة قوائم الفلاتر (الفئات والبراندات)
         populateFilters() {
             // تعبئة فلتر الفئات من هيكلة النموذج
-            const categories = Object.keys(this.state.formStructure?.config || {});
-            this.elements.categoryFilter.innerHTML = '<option value="">كل الفئات</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (this.elements.categoryFilter) {
+                const categories = Object.keys(this.state.formStructure?.config || {});
+                this.elements.categoryFilter.innerHTML = '<option value="">كل الفئات</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
 
             // تعبئة فلتر البراندات من الحالة
-            const brands = this.state.allBrands.map(b => b.name);
-            this.elements.brandFilter.innerHTML = '<option value="">كل البراندات</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+            if (this.elements.brandFilter) {
+                const brands = this.state.allBrands.map(b => b.name);
+                this.elements.brandFilter.innerHTML = '<option value="">كل البراندات</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+            }
             
             // لم نعد بحاجة لقائمة اقتراحات البراندات
             if (this.elements.brandDatalist) {
@@ -1338,7 +1336,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     p.name_ar.toLowerCase().includes(term) ||
                     (p.sku && p.sku.toLowerCase().includes(term)) ||
                     (p.model && p.model.toLowerCase().includes(term)) ||
-                    (p.tags && p.tags.some(t => t.toLowerCase().includes(term)))
+                    (p.tags && p.tags.some(t => t.toLowerCase().includes(term))) ||
+                    (p.barcode && p.barcode.toLowerCase().includes(term))
                 );
             }
 
@@ -1372,7 +1371,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return 0;
             });
 
-            this.renderProductsGrid(filteredProducts);
+            // اختر طريقة العرض حسب الحالة
+            if (this.state.viewMode === 'list') {
+                this.renderProductsList(filteredProducts);
+            } else {
+                this.renderProductsGrid(filteredProducts);
+            }
         },
 
         // عرض شبكة المنتجات في الواجهة
@@ -1409,7 +1413,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // إنشاء HTML لكارت منتج واحد
         createProductCardHTML(product) {
-            const priceDisplay = utils.formatPrice(product.price_usd);
+            const customerPrice = utils.formatPrice(product.price_usd);
+            const storePrice = (typeof product.price_store_usd !== 'undefined' && product.price_store_usd !== null) ? utils.formatPrice(product.price_store_usd) : null;
             const stockColor = product.stock > 5 ? 'text-success' : (product.stock > 0 ? 'text-warning' : 'text-danger');
             
             return `
@@ -1422,9 +1427,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <h5 class="card-title mb-2">${product.name_ar}</h5>
                             <p class="card-text text-muted small">${[product.sku, product.model].filter(Boolean).join(' / ')}</p>
-                            <div class="mt-auto text-end">
-                                <span class="price">${priceDisplay}</span>
-                                <small class="text-muted"> / ${product.unit}</small>
+                            <div class="mt-auto text-end price-block">
+                                <div class="customer-price">${customerPrice} <small class="text-muted">/ ${product.unit}</small></div>
+                                ${storePrice ? `<div class="store-price">سعر البيع - محل: ${storePrice}</div>` : ''}
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
@@ -1435,6 +1440,67 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="fw-bold ${stockColor}">
                                 <i class="bi bi-box-seam"></i> ${product.stock}
                             </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        // عرض المنتجات كقائمة صفوف
+        renderProductsList(products) {
+            if (products.length === 0) {
+                this.elements.productsGrid.innerHTML = '';
+                this.elements.noResultsDiv.style.display = 'block';
+                return;
+            }
+
+            this.elements.noResultsDiv.style.display = 'none';
+            // استخدام قائمة مرنة لكل صف
+            this.elements.productsGrid.innerHTML = '<div class="list-group w-100">' + products.map(p => this.createProductListItemHTML(p)).join('') + '</div>';
+
+            // ربط الأحداث للصفوف
+            this.elements.productsGrid.querySelectorAll('.product-list-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (e.target.closest('.product-actions')) return;
+                    this.showProductDetails(item.dataset.id);
+                });
+            });
+            this.elements.productsGrid.querySelectorAll('.list-edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.editProduct(btn.dataset.id);
+                });
+            });
+            this.elements.productsGrid.querySelectorAll('.list-delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.deleteProduct(btn.dataset.id);
+                });
+            });
+        },
+
+        // إنشاء HTML لصف منتج واحد (قائمة)
+        createProductListItemHTML(product) {
+            const customerPrice = utils.formatPrice(product.price_usd);
+            const storePrice = (typeof product.price_store_usd !== 'undefined' && product.price_store_usd !== null) ? utils.formatPrice(product.price_store_usd) : null;
+            const stockColor = product.stock > 5 ? 'text-success' : (product.stock > 0 ? 'text-warning' : 'text-danger');
+            return `
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center product-list-item" data-id="${product.id}">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="product-info">
+                            <div class="fw-bold">${product.name_ar}</div>
+                            <div class="small text-muted">${[product.sku, product.model].filter(Boolean).join(' / ')} · ${product.brand || ''}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                            <div class="text-end">
+                            <div class="customer-price">${customerPrice} <small class="text-muted">/ ${product.unit}</small></div>
+                            ${storePrice ? `<div class="store-price">سعر البيع - محل: ${storePrice}</div>` : ''}
+                            <div class="small ${stockColor}"><i class="bi bi-box-seam"></i> ${product.stock}</div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-sm btn-outline-primary list-edit-btn" data-id="${product.id}"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger list-delete-btn" data-id="${product.id}"><i class="bi bi-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -1456,7 +1522,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 brand: form.querySelector('#brand').value.trim(),
                 description: form.querySelector('#description').value.trim(),
                 price_usd: parseFloat(form.querySelector('#price_usd')?.value) || 0,
+                price_store_usd: parseFloat(form.querySelector('#price_store_usd')?.value) || 0,
                 unit: form.querySelector('#unit')?.value.trim() || '',
+                barcode: form.querySelector('#barcode')?.value.trim() || '',
                 stock: parseInt(form.querySelector('#stock').value) || 0,
                 variants: {
                     per_meter: {
@@ -1494,7 +1562,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (productData.price_usd < 0) {
-                validationErrors.push('السعر لا يمكن أن يكون سالباً');
+                validationErrors.push('سعر البيع (زبون) لا يمكن أن يكون سالباً');
+            }
+            if (productData.price_store_usd < 0) {
+                validationErrors.push('سعر البيع (محل) لا يمكن أن يكون سالباً');
             }
             
             if (productData.stock < 0) {
@@ -1567,7 +1638,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // دالة للحصول على التغييرات في المنتج
         getProductChanges(oldProduct, newProduct) {
             const changes = {};
-            const fields = ['name_ar', 'sku', 'model', 'brand', 'price_usd', 'stock', 'mainCategory'];
+            const fields = ['name_ar', 'sku', 'model', 'brand', 'price_usd', 'price_store_usd', 'stock', 'mainCategory'];
             
             fields.forEach(field => {
                 if (oldProduct[field] !== newProduct[field]) {
@@ -1598,31 +1669,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // تحضير نموذج التعديل
         async editProduct(id) {
-            const product = await dbManager.get(id);
-            if (!product) return;
+            try {
+                const product = await dbManager.get(id);
+                if (!product) {
+                    console.error('المنتج غير موجود');
+                    return;
+                }
 
-            const form = this.elements.productForm;
-            form.querySelector('#product-id').value = product.id;
-            form.querySelector('#name_ar').value = product.name_ar;
-            form.querySelector('#serial_number').value = product.serial_number || '';
-            form.querySelector('#sku').value = product.sku || '';
-            form.querySelector('#model').value = product.model || '';
-            form.querySelector('#brand').value = product.brand || '';
-            form.querySelector('#description').value = product.description || '';
-            form.querySelector('#stock').value = product.stock;
+                // تعيين معرف المنتج أولاً
+                const productIdInput = this.elements.productForm.querySelector('#product-id');
+                if (productIdInput) {
+                    productIdInput.value = product.id;
+                }
 
-            // استدعاء منشئ النماذج مع بيانات المنتج والبنية الديناميكية
-            formGenerator.init(
-                this.elements.dynamicFieldsContainer, 
-                this.elements.pricingFieldsContainer, 
-                this.state.formStructure.config, // <-- Pass the dynamic config
-                product
-            );
+                // تعيين البيانات الأساسية
+                const nameInput = this.elements.productForm.querySelector('#name_ar');
+                if (nameInput) nameInput.value = product.name_ar || '';
 
-            this.elements.productModalLabel.textContent = 'تعديل المنتج';
-            this.elements.saveProductBtn.textContent = 'حفظ التعديلات';
-            if (this.elements.productModal) {
-            this.elements.productModal.show();
+                const serialInput = this.elements.productForm.querySelector('#serial_number');
+                if (serialInput) serialInput.value = product.serial_number || '';
+
+                const skuInput = this.elements.productForm.querySelector('#sku');
+                if (skuInput) skuInput.value = product.sku || '';
+
+                const modelInput = this.elements.productForm.querySelector('#model');
+                if (modelInput) modelInput.value = product.model || '';
+
+                const brandSelect = this.elements.productForm.querySelector('#brand');
+                if (brandSelect) brandSelect.value = product.brand || '';
+
+                const descriptionInput = this.elements.productForm.querySelector('#description');
+                if (descriptionInput) descriptionInput.value = product.description || '';
+
+                const stockInput = this.elements.productForm.querySelector('#stock');
+                if (stockInput) stockInput.value = product.stock || 0;
+
+                // تحديث عنوان المودال والأزرار
+                this.elements.productModalLabel.textContent = 'تعديل المنتج';
+                this.elements.saveProductBtn.textContent = 'حفظ التعديلات';
+
+                // استدعاء منشئ النماذج مع بيانات المنتج والبنية الديناميكية
+                if (this.state.formStructure && this.state.formStructure.config) {
+                    formGenerator.init(
+                        this.elements.dynamicFieldsContainer, 
+                        this.elements.pricingFieldsContainer, 
+                        this.state.formStructure.config,
+                        product
+                    );
+                }
+
+                // فتح المودال
+                if (this.elements.productModal) {
+                    this.elements.productModal.show();
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل بيانات المنتج:', error);
             }
         },
 
@@ -1740,8 +1841,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h5>الأسعار</h5>
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        السعر الأساسي
+                        سعر البيع - زبون
                         <span class="fw-bold" style="direction: ltr;">${utils.formatPrice(p.price_usd)} / ${p.unit}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        سعر البيع - محل
+                        <span class="fw-bold" style="direction: ltr;">${typeof p.price_store_usd !== 'undefined' && p.price_store_usd !== null ? utils.formatPrice(p.price_store_usd) : '-'} / ${p.unit}</span>
                     </li>
                     ${p.variants?.per_meter?.price_usd ? `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -1786,19 +1891,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         applyTheme(theme) {
             document.documentElement.setAttribute('data-bs-theme', theme);
-            const themeToggler = document.getElementById('theme-toggler');
-            if (themeToggler) {
-                const icon = themeToggler.querySelector('i');
-                if (icon) {
-            if (theme === 'dark') {
-                icon.classList.remove('bi-moon-stars-fill');
-                icon.classList.add('bi-sun-fill');
-            } else {
-                icon.classList.remove('bi-sun-fill');
-                icon.classList.add('bi-moon-stars-fill');
-                    }
+            // تحديث الأيقونات إن وُجدت (الهيدر أو زر الإعدادات)
+            const togglerIds = ['theme-toggler', 'theme-toggler-settings'];
+            togglerIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const icon = el.querySelector('i');
+                if (!icon) return;
+                if (theme === 'dark') {
+                    icon.classList.remove('bi-moon-stars-fill');
+                    icon.classList.add('bi-sun-fill');
+                } else {
+                    icon.classList.remove('bi-sun-fill');
+                    icon.classList.add('bi-moon-stars-fill');
                 }
-            }
+            });
         },
 
         saveTheme(theme) {
@@ -1875,12 +1982,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4.5. منطق إدارة البراندات
         // =======================================================================
         async loadAndRenderBrands() {
-            this.state.allBrands = await dbManager.getAllBrands();
-            this.state.allBrands.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
-            this.renderBrandsInSettings();
-            this.populateBrandDropdown();
-            // تحديث فلاتر الصفحة الرئيسية
-            this.populateFilters();
+            try {
+                this.state.allBrands = await dbManager.getAllBrands();
+                if (!this.state.allBrands) {
+                    this.state.allBrands = [];
+                }
+                this.state.allBrands.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+                this.renderBrandsInSettings();
+                this.populateBrandDropdown();
+                // تحديث فلاتر الصفحة الرئيسية
+                this.populateFilters();
+            } catch (error) {
+                console.error('خطأ في تحميل البراندات:', error);
+                this.state.allBrands = [];
+            }
         },
 
         renderBrandsInSettings() {
@@ -1903,8 +2018,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         populateBrandDropdown() {
-            const brandSelect = this.elements.productForm.querySelector('#brand');
+            // البحث عن عنصر select البراند في جميع الصفحات
+            const brandSelect = document.querySelector('#brand');
             if (!brandSelect || brandSelect.tagName !== 'SELECT') return; // تأكد من أنه select
+            
+            // التأكد من وجود البيانات
+            if (!this.state.allBrands || !Array.isArray(this.state.allBrands)) {
+                console.warn('allBrands غير محملة بعد');
+                return;
+            }
+            
             const currentBrand = brandSelect.value;
             brandSelect.innerHTML = '<option value="" selected>اختر براند...</option>' + this.state.allBrands.map(brand =>
                 `<option value="${brand.name}">${brand.name}</option>`
@@ -1920,7 +2043,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newName = this.elements.brandNameInput.value.trim();
 
             if (!newName) {
-                alert('الرجاء إدخال اسم البراند.');
+                notificationSystem.showInAppNotification('الرجاء إدخال اسم البراند.', 'warning');
                 return;
             }
 
@@ -1941,13 +2064,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this.resetBrandForm();
                 await this.loadAndRenderBrands();
-                await this.loadAndRenderProducts(); // لإعادة جلب المنتجات المحدثة
+                
+                // Only reload products if on the products page
+                if (document.getElementById('products-grid')) {
+                    await this.loadAndRenderProducts();
+                }
+                
+                notificationSystem.showInAppNotification('تم حفظ البراند بنجاح.', 'success');
+
             } catch (error) {
                 if (error.name === 'ConstraintError') {
-                    alert('هذا البراند موجود بالفعل.');
+                    notificationSystem.showInAppNotification('هذا البراند موجود بالفعل.', 'error');
                 } else {
-                    alert('حدث خطأ أثناء حفظ البراند.');
-                    console.error(error);
+                    notificationSystem.showInAppNotification('حدث خطأ أثناء حفظ البراند.', 'error');
+                    console.error('خطأ في حفظ البراند:', error);
                 }
             }
         },
@@ -1967,13 +2097,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const productsUsingBrand = this.state.allProducts.filter(p => p.brand === brandToDelete.name);
             if (productsUsingBrand.length > 0) {
-                alert(`لا يمكن حذف البراند "${brandToDelete.name}" لأنه مستخدم في ${productsUsingBrand.length} منتج.\nالرجاء تغيير براند هذه المنتجات أولاً.`);
+                notificationSystem.showInAppNotification(`لا يمكن حذف البراند "${brandToDelete.name}" لأنه مستخدم في ${productsUsingBrand.length} منتج.\nالرجاء تغيير براند هذه المنتجات أولاً.`, 'warning', 7000);
                 return;
             }
 
-            if (confirm(`هل أنت متأكد من حذف البراند: "${brandToDelete.name}"؟`)) {
-                await dbManager.deleteBrand(id);
-                await this.loadAndRenderBrands();
+            if (confirm(`هل أنت متأكد من حذف البراند: "${brandToDelete.name}"?`)) {
+                try {
+                    await dbManager.deleteBrand(id);
+                    await this.loadAndRenderBrands();
+                    // Re-render products only if we are on the products page
+                    if (document.getElementById('products-grid')) {
+                        await this.loadAndRenderProducts();
+                    }
+                } catch (error) {
+                    console.error('خطأ في حذف البراند:', error);
+                    notificationSystem.showInAppNotification('حدث خطأ أثناء حذف البراند.', 'error');
+                }
             }
         },
 
@@ -1989,10 +2128,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // 5. منطق إدارة الوحدات
         // =======================================================================
         async loadAndRenderUnits() {
-            this.state.allUnits = await dbManager.getAllUnits();
-            this.state.allUnits.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
-            this.renderUnitsInSettings();
-            this.populateUnitDropdown();
+            try {
+                this.state.allUnits = await dbManager.getAllUnits();
+                if (!this.state.allUnits) {
+                    this.state.allUnits = [];
+                }
+                this.state.allUnits.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+                this.renderUnitsInSettings();
+                this.populateUnitDropdown();
+            } catch (error) {
+                console.error('خطأ في تحميل الوحدات:', error);
+                this.state.allUnits = [];
+            }
         },
 
         renderUnitsInSettings() {
@@ -2015,11 +2162,19 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         populateUnitDropdown() {
-            const unitSelect = this.elements.productForm.querySelector('#unit');
+            // البحث عن عنصر select الوحدة في جميع الصفحات
+            const unitSelect = document.querySelector('#unit');
             // إذا لم يكن النموذج معروضًا (مثل أثناء التهيئة الأولية)، فلا تفعل شيئًا
             if (!unitSelect) {
                 return;
             }
+            
+            // التأكد من وجود البيانات
+            if (!this.state.allUnits || !Array.isArray(this.state.allUnits)) {
+                console.warn('allUnits غير محملة بعد');
+                return;
+            }
+            
             const currentUnit = unitSelect.value;
             unitSelect.innerHTML = '<option value="" disabled>اختر وحدة...</option>' + this.state.allUnits.map(unit =>
                 `<option value="${unit.name}">${unit.name}</option>`
@@ -2037,7 +2192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newName = this.elements.unitNameInput.value.trim();
 
             if (!newName) {
-                alert('الرجاء إدخال اسم الوحدة.');
+                notificationSystem.showInAppNotification('الرجاء إدخال اسم الوحدة.', 'warning');
                 return;
             }
 
@@ -2058,12 +2213,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this.resetUnitForm();
                 await this.loadAndRenderUnits();
-                await this.loadAndRenderProducts();
+                if (document.getElementById('products-grid')) {
+                    await this.loadAndRenderProducts();
+                }
             } catch (error) {
                 if (error.name === 'ConstraintError') {
-                    alert('هذه الوحدة موجودة بالفعل.');
+                    notificationSystem.showInAppNotification('هذه الوحدة موجودة بالفعل.', 'error');
                 } else {
-                    alert('حدث خطأ أثناء حفظ الوحدة.');
+                    notificationSystem.showInAppNotification('حدث خطأ أثناء حفظ الوحدة.', 'error');
                     console.error(error);
                 }
             }
@@ -2084,11 +2241,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const productsUsingUnit = this.state.allProducts.filter(p => p.unit === unitToDelete.name);
             if (productsUsingUnit.length > 0) {
-                alert(`لا يمكن حذف الوحدة "${unitToDelete.name}" لأنها مستخدمة في ${productsUsingUnit.length} منتج.\nالرجاء تغيير وحدة هذه المنتجات أولاً.`);
+                notificationSystem.showInAppNotification(`لا يمكن حذف الوحدة "${unitToDelete.name}" لأنها مستخدمة في ${productsUsingUnit.length} منتج.\nالرجاء تغيير وحدة هذه المنتجات أولاً.`, 'warning', 7000);
                 return;
             }
 
-            if (confirm(`هل أنت متأكد من حذف الوحدة: "${unitToDelete.name}"؟`)) {
+            if (confirm(`هل أنت متأكد من حذف الوحدة: "${unitToDelete.name}"?`)) {
                 await dbManager.deleteUnit(id);
                 await this.loadAndRenderUnits();
             }
@@ -2227,637 +2384,9 @@ document.addEventListener('DOMContentLoaded', () => {
             notificationSystem.showInAppNotification('تم حفظ إعدادات التقارير بنجاح', 'success');
         },
 
-        // =======================================================================
-        // إعدادات نقطة البيع
-        // =======================================================================
-        bindPosSettings() {
-            const savePosBtn = document.getElementById('save-pos-settings');
-            if (savePosBtn) {
-                savePosBtn.addEventListener('click', () => this.savePosSettings());
-            }
 
-            this.loadPosSettings();
-        },
 
-        loadPosSettings() {
-            const settings = this.getPosSettings();
-            
-            Object.entries(settings).forEach(([key, value]) => {
-                const element = document.getElementById(key);
-                if (element) {
-                    if (element.type === 'checkbox') {
-                        element.checked = value;
-                    } else {
-                        element.value = value;
-                    }
-                }
-            });
-        },
 
-        getPosSettings() {
-            const saved = localStorage.getItem('posSettings');
-            return saved ? JSON.parse(saved) : {
-                'store-name': 'محل الصدارة',
-                'store-address': '',
-                'store-phone': '',
-                'tax-rate': 15,
-                'invoice-prefix': 'INV',
-                'invoice-digits': 6,
-                'invoice-start': 1,
-                'auto-reset-invoice': true,
-                'print-width': 80,
-                'font-size': 14,
-                'paper-size': 'A4',
-                'show-barcode-in-invoice': false,
-                'show-supplier-in-invoice': false,
-                'show-description-in-invoice': true
-            };
-        },
-
-        savePosSettings() {
-            const settings = {
-                'store-name': document.getElementById('store-name')?.value ?? 'محل الصدارة',
-                'store-address': document.getElementById('store-address')?.value ?? '',
-                'store-phone': document.getElementById('store-phone')?.value ?? '',
-                'tax-rate': parseFloat(document.getElementById('tax-rate')?.value) ?? 15,
-                'invoice-prefix': document.getElementById('invoice-prefix')?.value ?? 'INV',
-                'invoice-digits': parseInt(document.getElementById('invoice-digits')?.value) ?? 6,
-                'invoice-start': parseInt(document.getElementById('invoice-start')?.value) ?? 1,
-                'auto-reset-invoice': document.getElementById('auto-reset-invoice')?.checked ?? true,
-                'print-width': parseInt(document.getElementById('print-width')?.value) ?? 80,
-                'font-size': parseInt(document.getElementById('font-size')?.value) ?? 14,
-                'paper-size': document.getElementById('paper-size')?.value ?? 'A4',
-                'show-barcode-in-invoice': document.getElementById('show-barcode-in-invoice')?.checked ?? false,
-                'show-supplier-in-invoice': document.getElementById('show-supplier-in-invoice')?.checked ?? false,
-                'show-description-in-invoice': document.getElementById('show-description-in-invoice')?.checked ?? true
-            };
-
-            localStorage.setItem('posSettings', JSON.stringify(settings));
-            notificationSystem.showInAppNotification('تم حفظ إعدادات نقطة البيع بنجاح', 'success');
-        },
-
-        // =======================================================================
-        // 6. منطق نقطة البيع (Point of Sale)
-        // =======================================================================
-        initPosPage() {
-            // أ. ملء كائن `elements` بالعناصر الخاصة بصفحة نقطة البيع
-            this.elements = {
-                ...this.elements, // الاحتفاظ بالعناصر العامة
-                posProductsGrid: document.getElementById('pos-products-grid'),
-                posSearchInput: document.getElementById('pos-search-input'),
-                posCategoryFilter: document.getElementById('pos-category-filter'),
-                quickAddBtn: document.getElementById('quick-add-btn'),
-                quickAddModal: document.getElementById('quickAddModal') ? new bootstrap.Modal(document.getElementById('quickAddModal')) : null,
-                quickProductSearch: document.getElementById('quick-product-search'),
-                quickSearchResults: document.getElementById('quick-search-results'),
-                quickProductDetails: document.getElementById('quick-product-details'),
-                quickQuantity: document.getElementById('quick-quantity'),
-                quickPrice: document.getElementById('quick-price'),
-                confirmQuickAdd: document.getElementById('confirm-quick-add'),
-                cartItems: document.getElementById('cart-items'),
-                clearCartBtn: document.getElementById('clear-cart-btn'),
-                subtotal: document.getElementById('subtotal'),
-                tax: document.getElementById('tax'),
-                total: document.getElementById('total'),
-                paymentMethod: document.getElementById('payment-method'),
-                customerName: document.getElementById('customer-name'),
-                customerPhone: document.getElementById('customer-phone'),
-                checkoutBtn: document.getElementById('checkout-btn'),
-                invoiceModal: document.getElementById('invoiceModal') ? new bootstrap.Modal(document.getElementById('invoiceModal')) : null,
-                invoiceContent: document.getElementById('invoice-content'),
-                printInvoiceBtn: document.getElementById('print-invoice-btn')
-            };
-
-            // ب. تهيئة عربة التسوق
-            this.state.cart = [];
-            this.selectedQuickProduct = null;
-            
-            // ج. ربط الأحداث الخاصة بصفحة نقطة البيع
-            this.bindPosPageEvents();
-            
-            // د. تحميل الفئات لعرضها في الفلتر
-            this.loadPosCategories();
-            
-            // هـ. عرض المنتجات
-            this.renderPosProducts();
-            
-            // و. تحديث واجهة العربة
-            this.updateCartUI();
-        },
-
-        bindPosPageEvents() {
-            // البحث عن المنتجات
-            const debouncedSearch = utils.debounce(() => this.renderPosProducts(), 200);
-            this.elements.posSearchInput.addEventListener('input', debouncedSearch);
-            
-            // فلتر الفئات
-            if (this.elements.posCategoryFilter) {
-                this.elements.posCategoryFilter.addEventListener('change', () => this.renderPosProducts());
-            }
-            
-            // زر الإضافة السريعة
-            if (this.elements.quickAddBtn) {
-                this.elements.quickAddBtn.addEventListener('click', () => this.openQuickAddModal());
-            }
-            
-            // البحث في الإضافة السريعة
-            if (this.elements.quickProductSearch) {
-                const debouncedQuickSearch = utils.debounce(() => this.searchProductsForQuickAdd(), 300);
-                this.elements.quickProductSearch.addEventListener('input', debouncedQuickSearch);
-            }
-            
-            // تأكيد الإضافة السريعة
-            if (this.elements.confirmQuickAdd) {
-                this.elements.confirmQuickAdd.addEventListener('click', () => this.confirmQuickAdd());
-            }
-            
-            // إفراغ العربة
-            this.elements.clearCartBtn.addEventListener('click', () => {
-                this.state.cart = [];
-                this.updateCartUI();
-            });
-            
-            // إتمام البيع
-            this.elements.checkoutBtn.addEventListener('click', () => this.processCheckout());
-            
-            // طباعة الفاتورة
-            this.elements.printInvoiceBtn.addEventListener('click', () => this.printInvoice());
-        },
-
-        loadPosCategories() {
-            const categories = Object.keys(this.state.formStructure?.config || {});
-            if (this.elements.posCategoryFilter) {
-                this.elements.posCategoryFilter.innerHTML = '<option value="">كل الفئات</option>' + 
-                    categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-            }
-        },
-
-        openQuickAddModal() {
-            if (this.elements.quickAddModal) {
-                this.elements.quickAddModal.show();
-                this.elements.quickProductSearch.focus();
-            }
-        },
-
-        async searchProductsForQuickAdd() {
-            const searchTerm = this.elements.quickProductSearch.value.toLowerCase();
-            if (searchTerm.length < 2) {
-                this.elements.quickSearchResults.style.display = 'none';
-                return;
-            }
-
-            const filteredProducts = this.state.allProducts.filter(product =>
-                product.name_ar.toLowerCase().includes(searchTerm) ||
-                (product.sku && product.sku.toLowerCase().includes(searchTerm)) ||
-                (product.model && product.model.toLowerCase().includes(searchTerm))
-            ).slice(0, 10); // أول 10 نتائج فقط
-
-            if (filteredProducts.length === 0) {
-                this.elements.quickSearchResults.innerHTML = '<div class="text-muted p-2">لا توجد منتجات مطابقة</div>';
-            } else {
-                this.elements.quickSearchResults.innerHTML = filteredProducts.map(product => `
-                    <div class="quick-search-item p-2 border-bottom cursor-pointer" data-product-id="${product.id}" style="cursor: pointer;">
-                        <div class="fw-bold">${product.name_ar}</div>
-                        <div class="small text-muted">${product.brand || ''} - ${utils.formatPrice(product.price_usd)}</div>
-                        <div class="small text-muted">المخزون: ${product.stock}</div>
-                    </div>
-                `).join('');
-
-                // ربط الأحداث
-                this.elements.quickSearchResults.querySelectorAll('.quick-search-item').forEach(item => {
-                    item.addEventListener('click', () => this.selectProductForQuickAdd(item.dataset.productId));
-                });
-            }
-
-            this.elements.quickSearchResults.style.display = 'block';
-        },
-
-        selectProductForQuickAdd(productId) {
-            const product = this.state.allProducts.find(p => p.id === productId);
-            if (!product) return;
-
-            this.selectedQuickProduct = product;
-            this.elements.quickProductDetails.style.display = 'block';
-            this.elements.quickSearchResults.style.display = 'none';
-            this.elements.quickProductSearch.value = product.name_ar;
-            this.elements.quickQuantity.max = product.stock;
-            this.elements.quickPrice.value = product.price_usd;
-            this.elements.confirmQuickAdd.disabled = false;
-        },
-
-        confirmQuickAdd() {
-            if (!this.selectedQuickProduct) return;
-
-            const quantity = parseInt(this.elements.quickQuantity.value) || 1;
-            const customPrice = parseFloat(this.elements.quickPrice.value) || this.selectedQuickProduct.price_usd;
-
-            if (quantity > this.selectedQuickProduct.stock) {
-                notificationSystem.showInAppNotification('الكمية المطلوبة أكبر من المخزون المتاح', 'error');
-                return;
-            }
-
-            // إضافة المنتج للسلة
-            const existingItem = this.state.cart.find(item => item.id === this.selectedQuickProduct.id);
-            
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                this.state.cart.push({
-                    id: this.selectedQuickProduct.id,
-                    name: this.selectedQuickProduct.name_ar,
-                    price: customPrice,
-                    unit: this.selectedQuickProduct.unit,
-                    quantity: quantity,
-                    maxQuantity: this.selectedQuickProduct.stock
-                });
-            }
-
-            this.updateCartUI();
-            notificationSystem.showInAppNotification(`تم إضافة ${this.selectedQuickProduct.name_ar} للسلة`, 'success');
-
-            // إغلاق النافذة وإعادة تعيين النموذج
-            if (this.elements.quickAddModal) {
-                this.elements.quickAddModal.hide();
-            }
-            this.resetQuickAddForm();
-        },
-
-        resetQuickAddForm() {
-            this.selectedQuickProduct = null;
-            this.elements.quickProductSearch.value = '';
-            this.elements.quickSearchResults.style.display = 'none';
-            this.elements.quickProductDetails.style.display = 'none';
-            this.elements.quickQuantity.value = '1';
-            this.elements.quickPrice.value = '';
-            this.elements.confirmQuickAdd.disabled = true;
-        },
-
-        renderPosProducts() {
-            const searchTerm = this.elements.posSearchInput?.value.toLowerCase() || '';
-            const categoryFilter = this.elements.posCategoryFilter?.value || '';
-            let filteredProducts = this.state.allProducts;
-            
-            // فلترة حسب البحث
-            if (searchTerm) {
-                filteredProducts = filteredProducts.filter(p => 
-                    p.name_ar.toLowerCase().includes(searchTerm) ||
-                    (p.sku && p.sku.toLowerCase().includes(searchTerm)) ||
-                    (p.model && p.model.toLowerCase().includes(searchTerm))
-                );
-            }
-            
-            // فلترة حسب الفئة
-            if (categoryFilter) {
-                filteredProducts = filteredProducts.filter(p => p.mainCategory === categoryFilter);
-            }
-            
-            this.elements.posProductsGrid.innerHTML = filteredProducts.map(p => this.createPosProductCardHTML(p)).join('');
-            
-            // ربط الأحداث للكروت الجديدة
-            this.elements.posProductsGrid.querySelectorAll('.pos-product-card').forEach(card => {
-                card.addEventListener('click', () => this.addToCart(card.dataset.id));
-            });
-        },
-
-        createPosProductCardHTML(product) {
-            const priceDisplay = utils.formatPrice(product.price_usd);
-            const stockClass = product.stock > 10 ? 'text-success' : (product.stock > 0 ? 'text-warning' : 'text-danger');
-            
-            return `
-                <div class="col-md-4 col-sm-6">
-                    <div class="card h-100 pos-product-card ${product.stock === 0 ? 'opacity-50' : ''}" data-id="${product.id}">
-                        <div class="card-body text-center">
-                            <h6 class="card-title">${product.name_ar}</h6>
-                            <p class="card-text text-muted small">${product.brand || ''}</p>
-                            <div class="fw-bold text-primary mb-2">${priceDisplay}</div>
-                            <div class="${stockClass} small">المخزون: ${product.stock}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        },
-
-        addToCart(productId) {
-            const product = this.state.allProducts.find(p => p.id === productId);
-            if (!product || product.stock === 0) return;
-            
-            // التحقق مما إذا كان المنتج موجودًا بالفعل في العربة
-            const existingItem = this.state.cart.find(item => item.id === productId);
-            
-            if (existingItem) {
-                // زيادة الكمية إذا كان المنتج موجودًا
-                if (existingItem.quantity < product.stock) {
-                    existingItem.quantity += 1;
-                } else {
-                    alert('لا يمكن إضافة كمية أكبر من المتوفر في المخزون!');
-                    return;
-                }
-            } else {
-                // إضافة منتج جديد إلى العربة
-                this.state.cart.push({
-                    id: product.id,
-                    name: product.name_ar,
-                    price: product.price_usd,
-                    unit: product.unit,
-                    quantity: 1,
-                    maxQuantity: product.stock
-                });
-            }
-            
-            this.updateCartUI();
-        },
-
-        updateCartUI() {
-            if (this.state.cart.length === 0) {
-                this.elements.cartItems.innerHTML = `
-                    <div class="text-center text-muted py-3">
-                        <i class="bi bi-cart-x fs-1"></i>
-                        <p class="mt-2">العربة فارغة</p>
-                    </div>
-                `;
-                this.elements.subtotal.textContent = '$0.00';
-                this.elements.tax.textContent = '$0.00';
-                this.elements.total.textContent = '$0.00';
-                return;
-            }
-            
-            // عرض عناصر العربة
-            let cartHTML = '';
-            let subtotal = 0;
-            
-            this.state.cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
-                
-                cartHTML += `
-                    <div class="d-flex justify-content-between align-items-center mb-2 cart-item">
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">${item.name}</div>
-                            <div class="small text-muted">${utils.formatPrice(item.price)} × ${item.quantity} ${item.unit}</div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="btn-group btn-group-sm me-2">
-                                <button class="btn btn-outline-secondary decrease-quantity" data-index="${index}" ${item.quantity <= 1 ? 'disabled' : ''}>
-                                    <i class="bi bi-dash"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary increase-quantity" data-index="${index}" ${item.quantity >= item.maxQuantity ? 'disabled' : ''}>
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                            </div>
-                            <div class="text-end me-2">
-                                <div>${utils.formatPrice(itemTotal)}</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-danger remove-item" data-index="${index}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            this.elements.cartItems.innerHTML = cartHTML;
-            
-            // حساب المجموع والضريبة والإجمالي
-            const taxRate = 0.15; // 15%
-            const tax = subtotal * taxRate;
-            const total = subtotal + tax;
-            
-            this.elements.subtotal.textContent = utils.formatPrice(subtotal);
-            this.elements.tax.textContent = utils.formatPrice(tax);
-            this.elements.total.textContent = utils.formatPrice(total);
-            
-            // ربط الأحداث للأزرار الجديدة
-            this.elements.cartItems.querySelectorAll('.decrease-quantity').forEach(btn => {
-                btn.addEventListener('click', (e) => this.changeCartItemQuantity(parseInt(e.currentTarget.dataset.index), -1));
-            });
-            
-            this.elements.cartItems.querySelectorAll('.increase-quantity').forEach(btn => {
-                btn.addEventListener('click', (e) => this.changeCartItemQuantity(parseInt(e.currentTarget.dataset.index), 1));
-            });
-            
-            this.elements.cartItems.querySelectorAll('.remove-item').forEach(btn => {
-                btn.addEventListener('click', (e) => this.removeFromCart(parseInt(e.currentTarget.dataset.index)));
-            });
-        },
-
-        changeCartItemQuantity(index, change) {
-            const item = this.state.cart[index];
-            const newQuantity = item.quantity + change;
-            
-            if (newQuantity > 0 && newQuantity <= item.maxQuantity) {
-                item.quantity = newQuantity;
-                this.updateCartUI();
-            }
-        },
-
-        removeFromCart(index) {
-            this.state.cart.splice(index, 1);
-            this.updateCartUI();
-        },
-
-        async processCheckout() {
-            if (this.state.cart.length === 0) {
-                notificationSystem.showInAppNotification('العربة فارغة! الرجاء إضافة منتجات أولاً.', 'warning');
-                return;
-            }
-            
-            // جمع معلومات العميل والفاتورة
-            const customerName = this.elements.customerName.value.trim() || 'عميل نقدى';
-            const customerPhone = this.elements.customerPhone.value.trim() || '-';
-            const paymentMethod = this.elements.paymentMethod.value;
-            
-            // الحصول على إعدادات نقطة البيع
-            const posSettings = this.getPosSettings();
-            
-            // حساب الإجماليات
-            let subtotal = 0;
-            this.state.cart.forEach(item => {
-                subtotal += item.price * item.quantity;
-            });
-            const taxRate = posSettings['tax-rate'] / 100; // تحويل النسبة المئوية إلى عشري
-            const tax = subtotal * taxRate;
-            const total = subtotal + tax;
-            
-            // إنشاء معلومات الفاتورة
-            const invoiceInfo = {
-                id: utils.generateId(),
-                date: new Date().toISOString(),
-                customer: {
-                    name: customerName,
-                    phone: customerPhone
-                },
-                items: [...this.state.cart],
-                paymentMethod: paymentMethod,
-                subtotal: subtotal,
-                tax: tax,
-                total: total
-            };
-            
-            // حفظ الفاتورة في قاعدة البيانات
-            await dbManager.addInvoice(invoiceInfo);
-            
-            // تسجيل العملية
-            await auditLogger.logOperation('create_invoice', {
-                invoiceId: invoiceInfo.id,
-                customerName: invoiceInfo.customer.name,
-                totalAmount: invoiceInfo.total,
-                itemCount: invoiceInfo.items.length,
-                paymentMethod: invoiceInfo.paymentMethod
-            });
-            
-            console.log('Invoice saved:', invoiceInfo);
-            
-            // تحديث المخزون
-            for (const cartItem of this.state.cart) {
-                const product = this.state.allProducts.find(p => p.id === cartItem.id);
-                if (product) {
-                    product.stock -= cartItem.quantity;
-                    await dbManager.update(product);
-                }
-            }
-            
-            // عرض الفاتورة
-            this.displayInvoice(invoiceInfo);
-            
-            // إفراغ العربة
-            this.state.cart = [];
-            this.updateCartUI();
-            
-            // إعادة تحميل المنتجات لتحديث المخزون المعروض
-            await this.loadAndRenderProducts();
-        },
-
-        displayInvoice(invoiceInfo) {
-            const paymentMethodText = {
-                'cash': 'نقدي',
-                'card': 'بطاقة',
-                'transfer': 'تحويل بنكي'
-            };
-            
-            // الحصول على إعدادات نقطة البيع
-            const posSettings = this.getPosSettings();
-            const storeName = posSettings['store-name'] || 'محل الصدارة';
-            const storeAddress = posSettings['store-address'] || '';
-            const storePhone = posSettings['store-phone'] || '';
-            const taxRate = posSettings['tax-rate'] || 15;
-            
-            const date = new Date(invoiceInfo.date);
-            const formattedDate = date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
-            
-            let itemsHTML = '';
-            invoiceInfo.items.forEach(item => {
-                itemsHTML += `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td class="text-center">${item.quantity} ${item.unit}</td>
-                        <td class="text-end">${utils.formatPrice(item.price)}</td>
-                        <td class="text-end">${utils.formatPrice(item.price * item.quantity)}</td>
-                    </tr>
-                `;
-            });
-            
-            this.elements.invoiceContent.innerHTML = `
-                <div class="container">
-                    <div class="row mb-4">
-                        <div class="col-12 text-center">
-                            <h3>${storeName}</h3>
-                            ${storeAddress ? `<p class="text-muted mb-1">${storeAddress}</p>` : ''}
-                            ${storePhone ? `<p class="text-muted mb-1">${storePhone}</p>` : ''}
-                            <p class="text-muted mb-1">فاتورة بيع</p>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <p><strong>رقم الفاتورة:</strong> ${invoiceInfo.id}</p>
-                            <p><strong>التاريخ:</strong> ${formattedDate}</p>
-                        </div>
-                        <div class="col-6 text-end">
-                            <p><strong>العميل:</strong> ${invoiceInfo.customer.name}</p>
-                            <p><strong>الهاتف:</strong> ${invoiceInfo.customer.phone}</p>
-                            <p><strong>طريقة الدفع:</strong> ${paymentMethodText[invoiceInfo.paymentMethod]}</p>
-                        </div>
-                    </div>
-                    
-                    <table class="table table-bordered mb-3">
-                        <thead>
-                            <tr>
-                                <th>المنتج</th>
-                                <th class="text-center">الكمية</th>
-                                <th class="text-end">السعر</th>
-                                <th class="text-end">الإجمالي</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHTML}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="3" class="text-end">المجموع:</th>
-                                <th class="text-end">${utils.formatPrice(invoiceInfo.subtotal)}</th>
-                            </tr>
-                            <tr>
-                                <th colspan="3" class="text-end">الضريبة (${taxRate}%):</th>
-                                <th class="text-end">${utils.formatPrice(invoiceInfo.tax)}</th>
-                            </tr>
-                            <tr>
-                                <th colspan="3" class="text-end">الإجمالي:</th>
-                                <th class="text-end">${utils.formatPrice(invoiceInfo.total)}</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    
-                    <div class="row mt-4">
-                        <div class="col-12 text-center">
-                            <p class="text-muted">شكراً لتعاملكم معنا!</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            if (this.elements.invoiceModal) {
-                this.elements.invoiceModal.show();
-            }
-            
-            // إظهار إشعار النجاح
-            notificationSystem.showInAppNotification('تم إتمام البيع بنجاح!', 'success');
-            notificationSystem.showBrowserNotification('بيع مكتمل', `تم بيع ${invoiceInfo.items.length} منتج بقيمة ${utils.formatPrice(invoiceInfo.total)}`);
-        },
-
-        printInvoice() {
-            // إنشاء نافذة طباعة
-            const printWindow = window.open('', '', 'width=800,height=600');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html dir="rtl" lang="ar">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>طباعة الفاتورة</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-                    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-                    <style>
-                        body { font-family: 'Tajawal', sans-serif; }
-                        @media print {
-                            .no-print { display: none !important; }
-                            page-break-inside: avoid;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container p-3">
-                        ${this.elements.invoiceContent.innerHTML}
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            window.close();
-                        }
-                    </script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        },
 
         // =======================================================================
         // بيانات أولية للتجربة
@@ -3171,8 +2700,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const unitSelectHTML = this.createSelect('unit', 'الوحدة الأساسية', units, this.product?.unit);
             this.pricingContainer.innerHTML = `<div class="col-md-4">${unitSelectHTML}</div>`;
 
-            const priceInputHTML = this.createInput('price_usd', 'السعر الأساسي (USD)', 'number', '', this.product?.price_usd);
-            this.pricingContainer.insertAdjacentHTML('beforeend', `<div class="col-md-4">${priceInputHTML}</div>`);
+            // سعر البيع للزبون (الاسم القديم للسعر الأساسي)
+            const customerPriceHTML = this.createInput('price_usd', 'سعر البيع - زبون', 'number', '', this.product?.price_usd);
+            // سعر البيع في المحل (سعر خاص للمتجر)
+            const storePriceHTML = this.createInput('price_store_usd', 'سعر البيع - محل', 'number', '', this.product?.price_store_usd);
+            this.pricingContainer.insertAdjacentHTML('beforeend', `<div class="col-md-4">${customerPriceHTML}</div>`);
+            this.pricingContainer.insertAdjacentHTML('beforeend', `<div class="col-md-4">${storePriceHTML}</div>`);
 
             if (this.product?.unit) {
                 this.toggleSpecialPricing(this.product.unit);
@@ -3504,4 +3037,296 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ابدأ التطبيق
     app.init();
+
+    /**
+     * =========================
+     * Bottom Navbar & Barcode Scan
+     * - يظهر الشريط فقط على شاشات الجوال (CSS + bootstrap classes)
+     * - زر المسح المركزي يفتح مودال يستخدم BarcodeDetector إن توفر
+     * - عند الحصول على قيمة الباركود نوجه المستخدم إلى صفحة المنتجات مع باراميتر البحث
+     * - توجد فallback للإدخال اليدوي أو رفع صورة (محاولة كشف الصورة إذا سمح المتصفح)
+     * =========================
+     */
+    (function(){
+        // حالة الماسح
+        const scanner = {
+            stream: null,
+            detector: null,
+            intervalId: null,
+            canvas: null,
+            ctx: null
+        };
+
+        // تهيئة عناصر العرض والسلوك للشريط السفلي
+        function initBottomNav() {
+            try {
+                const bnProducts = document.getElementById('bn-products');
+                const bnReports = document.getElementById('bn-reports');
+                const bnSettings = document.getElementById('bn-settings');
+                const bnPrice = document.getElementById('bn-price-view');
+                const bnAdd = document.getElementById('bn-add');
+
+                // تعيين التاب النشط حسب المسار
+                const path = window.location.pathname || '';
+                if (path.includes('/products/')) {
+                    if (bnProducts) bnProducts.classList.add('active');
+                } else if (path.includes('/reports/')) {
+                    if (bnReports) bnReports.classList.add('active');
+                } else if (path.includes('/settings/')) {
+                    if (bnSettings) bnSettings.classList.add('active');
+                } else if (path.includes('/price-view/')) {
+                    if (bnPrice) bnPrice.classList.add('active');
+                } else {
+                    // الحالة الافتراضية: المنتجات
+                    if (bnProducts) bnProducts.classList.add('active');
+                }
+
+                // زر الإضافة في الشريط السفلي: إن كنا في صفحة المنتجات، افتح مودال الإضافة محلياً
+                if (bnAdd) {
+                    bnAdd.addEventListener('click', (e) => {
+                        const path = window.location.pathname || '';
+                        // إذا نحن فعلاً داخل صفحة المنتجات، عرض مودال إضافة المنتج دون إعادة تحميل
+                        if (path.includes('/products/')) {
+                            e.preventDefault();
+                            try {
+                                // إعادة تهيئة النموذج إن كانت الدالة متاحة
+                                if (typeof app !== 'undefined' && app.resetForm) {
+                                    app.resetForm();
+                                }
+                            } catch (err) {
+                                console.warn('خطأ أثناء تهيئة نموذج الإضافة:', err);
+                            }
+
+                            const productModalEl = document.getElementById('productModal');
+                            if (productModalEl) {
+                                const pm = bootstrap.Modal.getOrCreateInstance(productModalEl);
+                                pm.show();
+                            } else {
+                                // كحل احتياطي: انتقل إلى صفحة المنتجات مع باراميتر فتح الإضافة
+                                window.location.href = bnAdd.getAttribute('href') || '../products/index.html?add=1';
+                            }
+                        }
+                        // إذا كنا في صفحة أخرى، الرابط الافتراضي سيأخذ المستخدم إلى صفحة المنتجات مع ?add=1
+                    });
+                }
+
+                // ربط أزرار البحث في المودال
+                const scanAction = document.getElementById('barcode-scan-action');
+                if (scanAction) {
+                    scanAction.addEventListener('click', () => {
+                        const manual = document.getElementById('barcode-manual-input').value.trim();
+                        if (manual) {
+                            handleScannedBarcode(manual);
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('barcodeScannerModal'));
+                            if (modal) modal.hide();
+                        } else {
+                            const status = document.getElementById('barcode-status');
+                            status.textContent = 'الرجاء إدخال رمز الباركود يدوياً أو استخدام زر المسح.';
+                        }
+                    });
+                }
+
+                // عند إغلاق المودال، أوقف الكاميرا والمسح
+                const modalEl = document.getElementById('barcodeScannerModal');
+                if (modalEl) {
+                    modalEl.addEventListener('hidden.bs.modal', () => stopBarcodeScan());
+                }
+            } catch (e) {
+                console.warn('initBottomNav error', e);
+            }
+        }
+
+        // بدء عملية المسح باستخدام BarcodeDetector إن وُجد
+        async function startBarcodeScan() {
+            const status = document.getElementById('barcode-status');
+            const video = document.getElementById('barcode-video');
+            const fallback = document.getElementById('barcode-fallback');
+
+            // إعادة تهيئة
+            stopBarcodeScan();
+
+            // تحقق من دعم BarcodeDetector
+            if ('BarcodeDetector' in window) {
+                try {
+                    // إنشاء كاشف للأنماط الشائعة
+                    scanner.detector = new BarcodeDetector({formats: ['ean_13','ean_8','qr_code','code_128','upc_e','upc_a']});
+
+                    // اطلب الوصول إلى الكاميرا الخلفية
+                    scanner.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    video.srcObject = scanner.stream;
+                    video.style.display = 'block';
+                    if (fallback) fallback.style.display = 'none';
+                    await video.play();
+
+                    // canvas للرسم وتحويل الإطار
+                    scanner.canvas = document.createElement('canvas');
+                    scanner.ctx = scanner.canvas.getContext('2d');
+
+                    status.textContent = 'جاري المسح... ضع الباركود داخل المربع.';
+
+                    // حلقة مسح دورية
+                    scanner.intervalId = setInterval(async () => {
+                        try {
+                            if (video.readyState !== HTMLMediaElement.HAVE_ENOUGH_DATA) return;
+                            scanner.canvas.width = video.videoWidth;
+                            scanner.canvas.height = video.videoHeight;
+                            scanner.ctx.drawImage(video, 0, 0, scanner.canvas.width, scanner.canvas.height);
+                            // تحويل إلى ImageBitmap لتحسين الأداء
+                            const bitmap = await createImageBitmap(scanner.canvas);
+                            const results = await scanner.detector.detect(bitmap);
+                            bitmap.close();
+                            if (results && results.length) {
+                                const value = results[0].rawValue || results[0].raw_data || '';
+                                if (value) {
+                                    status.textContent = 'تم التعرف على الكود: ' + value;
+                                    handleScannedBarcode(value);
+                                    // أغلق المودال تلقائياً
+                                    const modal = bootstrap.Modal.getInstance(document.getElementById('barcodeScannerModal'));
+                                    if (modal) modal.hide();
+                                    stopBarcodeScan();
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('scan loop error', err);
+                        }
+                    }, 500);
+
+                    return;
+                } catch (err) {
+                    console.warn('BarcodeDetector / camera error:', err);
+                    status.textContent = 'تعذّر تشغيل الكاميرا أو الماسح. الرجاء استخدام الإدخال اليدوي.';
+                }
+            } else {
+                // لا يوجد دعم BarcodeDetector
+                status.textContent = 'مسح الباركود غير مدعوم في متصفحك. الرجاء إدخال الكود يدوياً.';
+                if (video) video.style.display = 'none';
+                if (fallback) fallback.style.display = 'block';
+            }
+        }
+
+        // إيقاف الكاميرا وتنظيف الموارد
+        function stopBarcodeScan() {
+            try {
+                if (scanner.intervalId) {
+                    clearInterval(scanner.intervalId);
+                    scanner.intervalId = null;
+                }
+                if (scanner.stream) {
+                    scanner.stream.getTracks().forEach(t => t.stop());
+                    scanner.stream = null;
+                }
+                const video = document.getElementById('barcode-video');
+                if (video) {
+                    video.pause();
+                    video.srcObject = null;
+                    video.style.display = 'none';
+                }
+                const fallback = document.getElementById('barcode-fallback');
+                if (fallback) fallback.style.display = 'block';
+            } catch (e) {
+                console.warn('stopBarcodeScan', e);
+            }
+        }
+
+        // عند الحصول على قيمة الباركود نقوم بتوجيه المستخدم إلى صفحة المنتجات مع الباركود كـ query param
+        function handleScannedBarcode(value) {
+            if (!value) return;
+            // إذا كنا بالفعل في صفحة المنتجات، نكتفي بتعيين الحقل وتشغيل الفلترة
+            const path = window.location.pathname || '';
+            if (path.includes('/products/')) {
+                try {
+                    // تعيين قيمة حقل البحث في صفحة المنتجات إن وُجد
+                    if (app && app.elements && app.elements.searchInput) {
+                        app.elements.searchInput.value = value;
+                        app.filterAndRender();
+                        // تحقق من النتائج بدقة بواسطة الدالة المساعدة
+                        try {
+                            const matches = app.findProductsByBarcode ? app.findProductsByBarcode(value) : [];
+                            if (matches && matches.length > 0) {
+                                const first = matches[0];
+                                // عرض إشعار نجاح
+                                if (typeof notificationSystem !== 'undefined') {
+                                    notificationSystem.showInAppNotification(`تم العثور على المنتج: ${first.name_ar}`, 'success', 5000);
+                                    notificationSystem.showBrowserNotification('منتج تم العثور عليه', `تم العثور على المنتج: ${first.name_ar}`);
+                                }
+                                // فتح تفاصيل المنتج لمراجعة سريعاً
+                                if (app.showProductDetails) app.showProductDetails(first.id);
+                                const status = document.getElementById('barcode-status');
+                                if (status) status.textContent = 'تم العثور على المنتج: ' + first.name_ar;
+                            } else {
+                                if (typeof notificationSystem !== 'undefined') {
+                                    notificationSystem.showInAppNotification(`لم يتم العثور على منتج بالباركود: ${value}`, 'error', 5000);
+                                }
+                                const status = document.getElementById('barcode-status');
+                                if (status) status.textContent = 'لم يتم العثور على منتج بالباركود.';
+                            }
+                        } catch (e) {
+                            console.warn('barcode handle error', e);
+                        }
+                        return;
+                    }
+                } catch (e) {
+                    console.warn(e);
+                }
+            }
+
+
+            // خلاف ذلك، ننتقل إلى صفحة المنتجات مع باراميتر البحث
+            // نستخدم رابط نسبي يتناسب مع موقع الصفحات (تقريبياً ../products/index.html)
+            const encoded = encodeURIComponent(value);
+            // إذا كنا في الجذر أو صفحة أخرى غير مجلد، استخدم المسار النسبي المناسب
+            if (path.includes('/price-view/') || path.includes('/reports/') || path.includes('/settings/')) {
+                window.location.href = '../products/index.html?barcode=' + encoded;
+            } else {
+                // صفحة أخرى (أو احتمالية تشغيل من products itself handled above)
+                window.location.href = './products/index.html?barcode=' + encoded;
+            }
+        }
+
+        // بعد تحميل التطبيق حاول تهيئة الشريط والتعامل مع الباراميتر barcode إن وُجد
+        try {
+            // تهيئة الشريط الآن
+            initBottomNav();
+
+            // بعد فترة قصيرة نجرب قراءة query param barcode إن كان موجوداً
+            setTimeout(() => {
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const bc = urlParams.get('barcode');
+                    if (bc) {
+                        // إذا صفحة المنتجات موجودة في الDOM، نفعل البحث محلياً
+                        if (document.getElementById('products-grid')) {
+                            if (app && app.elements && app.elements.searchInput) {
+                                app.elements.searchInput.value = bc;
+                                app.filterAndRender();
+                            }
+                        }
+                            // تحقق من باراميتر فتح نموذج الإضافة
+                            const addParam = urlParams.get('add');
+                            if (addParam === '1') {
+                                // إذا صفحة المنتجات محملة محلياً، افتح مودال الإضافة
+                                if (document.getElementById('products-grid')) {
+                                    try {
+                                        if (app && app.resetForm) app.resetForm();
+                                    } catch (e) {
+                                        console.warn('error resetting add form via query param', e);
+                                    }
+                                    const productModalEl = document.getElementById('productModal');
+                                    if (productModalEl) {
+                                        const pm = bootstrap.Modal.getOrCreateInstance(productModalEl);
+                                        pm.show();
+                                    }
+                                }
+                            }
+                    }
+                } catch (e) {
+                    console.warn('barcode param handling error', e);
+                }
+            }, 500);
+        } catch (e) {
+            console.warn('Bottom nav initializer error', e);
+        }
+
+    })();
+
 });

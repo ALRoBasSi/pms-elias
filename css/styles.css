@@ -1,3 +1,55 @@
+/* --- شريط أدوات المنتجات (بحث + فلاتر) --- */
+.products-toolbar {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 0.75rem 0.75rem 0.5rem 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 1.5rem;
+}
+.products-toolbar .search-box {
+    min-width: 180px;
+    max-width: 320px;
+}
+.products-toolbar .filter-select {
+    min-width: 120px;
+    max-width: 180px;
+    font-size: 0.98rem;
+    border-radius: 0.5rem;
+    margin-inline: 0.1rem;
+}
+
+/* Controls row: make dropdowns consistent size and align */
+.products-toolbar .controls {
+    gap: .5rem;
+}
+.products-toolbar .controls .filter-select {
+    min-width: 140px;
+    max-width: 220px;
+    flex: 0 0 180px; /* preferred width */
+}
+.products-toolbar .controls .btn-group { flex: 0 0 auto; }
+
+@media (max-width: 767.98px) {
+    /* On small screens, allow wrapping and make selects full width */
+    .products-toolbar .controls { gap: .5rem; }
+    .products-toolbar .controls .filter-select { flex: 1 1 100%; min-width: 0; max-width: 100%; }
+    .products-toolbar .controls .btn-group { width: 100%; }
+}
+
+@media (max-width: 767.98px) {
+    .products-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.75rem 0.25rem 0.5rem 0.25rem;
+    }
+    .products-toolbar .search-box,
+    .products-toolbar .filter-select {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+}
 /* --- إعدادات أساسية وخطوط --- */
 body {
     font-family: 'Segoe UI', 'Tahoma', 'Arial', 'Helvetica', sans-serif;
@@ -50,6 +102,43 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+}
+
+/* Price block styles for clear visual distinction */
+.price-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+.customer-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--bs-primary);
+    direction: ltr;
+}
+.customer-price small {
+    font-weight: 600;
+    color: #6c757d;
+}
+.store-price {
+    font-size: 0.875rem;
+    color: var(--bs-success);
+    background-color: rgba(16,185,129,0.06); /* subtle green bg */
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.375rem;
+    direction: ltr;
+}
+
+/* List view price styling */
+.product-list-item .customer-price {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--bs-primary);
+}
+.product-list-item .store-price {
+    font-size: 0.85rem;
+    color: var(--bs-success);
 }
 
 .product-card .card-title {
@@ -175,3 +264,123 @@ body {
     overflow-y: auto;
     padding-left: 1rem;
 }
+
+/* ----------------- شريط التنقل السفلي (Mobile Bottom Navbar) ----------------- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1080; /* أعلى قليلاً من عناصر الصفحة */
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+}
+.bottom-nav .bottom-nav-item {
+    color: var(--bs-body-color);
+    text-decoration: none;
+    flex: 1 1 auto;
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    transition: color 200ms ease, transform 150ms ease;
+}
+.bottom-nav .bottom-nav-item .small {
+    display:block;
+    line-height:1;
+}
+.bottom-nav .bottom-nav-item.active {
+    color: var(--bs-primary);
+}
+.bottom-nav central button styles removed (was used for scan button). The add-button uses standard .btn styles now.
+
+/* Hide the bottom-nav on medium+ (Bootstrap classes also applied) */
+@media (min-width: 768px) {
+    .bottom-nav { display: none !important; }
+}
+
+/* Barcode video styling inside modal */
+#barcode-video {
+    border-radius: .5rem;
+    background-color: #000;
+}
+
+/* small animation for active icon */
+.bottom-nav .bottom-nav-item i { transition: transform 180ms ease; }
+.bottom-nav .bottom-nav-item.active i { transform: translateY(-3px) scale(1.08); }
+
+/* ----------------- Mobile adjustments when bottom-nav is visible ----------------- */
+@media (max-width: 767.98px) {
+    /* إخفاء الهيدر بالكامل على شاشات الهواتف */
+    header.navbar { display: none !important; }
+
+    /* زيادة المساحة السفلية لمنع تغطية المحتوى بواسطة الشريط الثابت */
+    main, .container, .container-fluid { padding-bottom: 92px; }
+
+    /* استغلال المساحة العلوية (بعد إخفاء الهيدر) ليكون المحتوى أقرب للشاشة */
+    main { margin-top: 0; padding-top: 0.75rem; }
+}
+
+/* FAB (Floating Action Button) removed — replaced by bottom-nav add button on small screens */
+
+/* Small visual tweak for dropdown menu items icons spacing */
+.dropdown-item i { width: 1.25rem; text-align: center; }
+
+/* --- تحسين مظهر قوائم الفلترة لتتناسب مع شاشات الهواتف --- */
+.filter-dropdowns .form-select {
+    font-size: 0.98rem;
+    min-height: 48px; /* لمس مريح */
+    border-radius: 0.5rem;
+}
+
+.filter-dropdowns .col-12 {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+}
+
+@media (max-width: 767.98px) {
+    /* اجعل عناصر الفلترة واضحة وكبيرة على الهواتف */
+    .filter-dropdowns .form-select {
+        font-size: 1rem;
+        min-height: 50px;
+    }
+    .filter-dropdowns .col-12 {
+        margin-bottom: 0.5rem;
+    }
+
+    /* View toggle buttons */
+    .products-toolbar .btn-group .btn {
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .products-toolbar .btn-group .btn.active {
+        background-color: var(--bs-primary);
+        color: #fff;
+        border-color: var(--bs-primary);
+    }
+
+    /* List view row styling */
+    .product-list-item {
+        cursor: pointer;
+    }
+    .product-list-item .product-actions button {
+        margin-left: 0.25rem;
+    }
+    .product-list-item:hover {
+        background-color: rgba(0,0,0,0.03);
+    }
+
+    /* Ensure price block fits nicely on small screens */
+    .price-block, .product-list-item .text-end {
+        align-items: flex-end;
+    }
+
+    @media (max-width: 767.98px) {
+        /* Ensure cards adapt nicely on small screens */
+        .col-sm-12 { flex: 0 0 100%; max-width: 100%; }
+        .col-md-6 { flex: 0 0 50%; max-width: 50%; }
+        .col-lg-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
+        .col-xl-3 { flex: 0 0 50%; max-width: 50%; }
+    }
+}
+
+

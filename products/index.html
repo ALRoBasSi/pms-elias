@@ -5,8 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المنتجات - محل الصدارة</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- ايقونة علامة التبويب -->
+    <link rel="icon"
+        href="data:image/svg+xml,
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+            <text y='.9em' font-size='90'>🏪</text></svg>">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet"> -->
+     <link href="../css/bootstrap.rtl.min.css" rel="stylesheet">
+
+ 
+    <!-- تم إزالة تحميل الخطوط من Google Fonts لاستخدام الخطوط المحلية -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> -->
+     <link rel="stylesheet" href="../css/bootstrap-icons.min.css">    
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
@@ -19,7 +29,8 @@
                 <i class="bi bi-shop-window"></i>
                 محل الصدارة
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar"
+                aria-controls="main-navbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="main-navbar">
@@ -28,22 +39,17 @@
                         <a class="nav-link active" aria-current="page" href="index.html">المنتجات</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../pos/index.html">نقطة البيع</a>
+                        <a class="nav-link" href="../reports/index.html">التقارير</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../reports/index.html">التقارير</a>
+                        <a class="nav-link" href="../price-view/index.html">عرض سعر</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../settings/index.html">الإعدادات</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <button class="btn btn-outline-secondary me-2" id="theme-toggler" type="button">
-                        <i class="bi bi-moon-stars-fill"></i>
-                    </button>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
-                        <i class="bi bi-plus-circle"></i> إضافة منتج
-                    </button>
+                    <!-- زر تغيير المظهر نُقل إلى صفحة الإعدادات ليكون متاحاً من هناك -->
                 </div>
             </div>
         </div>
@@ -54,43 +60,38 @@
         <!-- Search and Filters -->
         <div class="card mb-4">
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-lg-6">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input type="search" id="search-input" class="form-control"
-                                placeholder="ابحث بالاسم، الرمز، أو التاج...">
+                <!-- شريط بحث وفلاتر: البحث كامل العرض في الأعلى، ثم صف واحد للفلترة مع أزرار العرض -->
+                <div class="products-toolbar mb-3">
+                    <div class="search-row mb-2 w-100">
+                        <div class="search-box w-100">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="search" id="search-input" class="form-control" placeholder="ابحث بالاسم أو الرقم التعريفي...">
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <select id="filter-category" class="form-select">
+
+                    <div class="controls d-flex flex-wrap align-items-center gap-2">
+                        <!-- View toggle first (leftmost in screenshot) -->
+                        <div class="btn-group" role="group" aria-label="عرض المنتجات">
+                            <button type="button" class="btn btn-outline-secondary" id="toolbar-barcode-btn" title="بحث بالباركود"><i class="bi bi-upc-scan"></i></button>
+                            <button type="button" class="btn btn-outline-secondary active" id="view-grid-btn" title="عرض كشبكة"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" id="view-list-btn" title="عرض كقائمة"><i class="bi bi-list-ul"></i></button>
+                        </div>
+
+                        <!-- Dropdowns on a single row with consistent sizing: category, brand, sort -->
+                        <select id="filter-category" class="form-select filter-select">
                             <option value="">كل الفئات</option>
                         </select>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <select id="filter-brand" class="form-select">
+                        <select id="filter-brand" class="form-select filter-select">
                             <option value="">كل البراندات</option>
                         </select>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-12">
-                        <select id="sort-by" class="form-select">
+                        <select id="sort-by" class="form-select filter-select">
                             <option value="created_at_desc">الأحدث أولاً</option>
                             <option value="price_asc">السعر: من الأقل للأعلى</option>
                             <option value="price_desc">السعر: من الأعلى للأقل</option>
                             <option value="name_asc">الاسم: أ-ي</option>
                         </select>
-                    </div>
-                </div>
-                <div class="row g-2 mt-3">
-                    <div class="col-md-6 d-flex gap-2">
-                        <label for="import-json" class="btn btn-outline-success mb-0">
-                            <i class="bi bi-file-earmark-arrow-up"></i> استيراد JSON
-                        </label>
-                        <input type="file" id="import-json" class="d-none" accept=".json">
-                        <button id="export-json" class="btn btn-outline-info"><i
-                                class="bi bi-file-earmark-arrow-down"></i> تصدير JSON</button>
-                        <button id="export-csv" class="btn btn-outline-secondary"><i class="bi bi-filetype-csv"></i>
-                            تصدير CSV</button>
                     </div>
                 </div>
             </div>
@@ -121,14 +122,26 @@
                         <div class="form-section">
                             <h5 class="form-section-title">المعلومات الأساسية</h5>
                             <div class="row g-3">
-                                <div class="col-12"><label for="name_ar" class="form-label">اسم المنتج <span class="text-danger">*</span></label><input type="text" class="form-control" id="name_ar" required></div>
-                                <div class="col-md-6"><label for="serial_number" class="form-label">Serial Number</label><input type="text" class="form-control" id="serial_number"></div>
-                                <div class="col-md-6"><label for="sku" class="form-label">SKU</label><input type="text" class="form-control" id="sku"></div>
-                                <div class="col-md-6"><label for="model" class="form-label">الموديل</label><input type="text" class="form-control" id="model"></div>
-                                <div class="col-md-6"><label for="brand" class="form-label">البراند</label><select id="brand" class="form-select" name="brand"></select></div>
-                                <div class="col-md-6"><label for="stock" class="form-label">الكمية في المخزون</label><input type="number" class="form-control" id="stock" value="0" min="0" inputmode="numeric"></div>
-                                <div class="col-12"><label for="description" class="form-label">الوصف</label><textarea class="form-control" id="description" rows="2"></textarea></div>
-                                <div class="col-12"><label for="product_images" class="form-label">صور المنتج</label><input type="file" class="form-control" id="product_images" multiple></div>
+                                <div class="col-12"><label for="name_ar" class="form-label">اسم المنتج <span
+                                            class="text-danger">*</span></label><input type="text" class="form-control"
+                                        id="name_ar" required></div>
+                                <div class="col-md-6"><label for="serial_number" class="form-label">Serial
+                                        Number</label><input type="text" class="form-control" id="serial_number"></div>
+                <div class="col-md-6"><label for="sku" class="form-label">SKU</label><input type="text"
+                    class="form-control" id="sku"></div>
+                <div class="col-md-6"><label for="barcode" class="form-label">باركود (Barcode)</label><input type="text" class="form-control" id="barcode" placeholder="رمز الباركود / UPC"></div>
+                                <div class="col-md-6"><label for="model" class="form-label">الموديل</label><input
+                                        type="text" class="form-control" id="model"></div>
+                                <div class="col-md-6"><label for="brand" class="form-label">البراند</label><select
+                                        id="brand" class="form-select" name="brand"></select></div>
+                                <div class="col-md-6"><label for="stock" class="form-label">الكمية في
+                                        المخزون</label><input type="number" class="form-control" id="stock" value="0"
+                                        min="0" inputmode="numeric"></div>
+                                <div class="col-12"><label for="description" class="form-label">الوصف</label><textarea
+                                        class="form-control" id="description" rows="2"></textarea></div>
+                                <div class="col-12"><label for="product_images" class="form-label">صور
+                                        المنتج</label><input type="file" class="form-control" id="product_images"
+                                        multiple></div>
                             </div>
                         </div>
                         <div class="form-section">
@@ -143,7 +156,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" form="product-form" class="btn btn-primary" id="save-product-btn">حفظ المنتج</button>
+                    <button type="submit" form="product-form" class="btn btn-primary" id="save-product-btn">حفظ
+                        المنتج</button>
                 </div>
             </div>
         </div>
@@ -166,8 +180,64 @@
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/app.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
+    
+                <!-- Bottom Navbar for mobile -->
+                <nav class="bottom-nav d-block d-md-none bg-body-tertiary border-top">
+                    <div class="container-fluid d-flex justify-content-between align-items-center py-2">
+                        <a href="index.html" class="text-center nav-item bottom-nav-item" id="bn-products">
+                            <i class="bi bi-grid-fill fs-4"></i>
+                            <div class="small">المنتجات</div>
+                        </a>
+                        <a href="../reports/index.html" class="text-center nav-item bottom-nav-item" id="bn-reports">
+                            <i class="bi bi-bar-chart-fill fs-4"></i>
+                            <div class="small">التقارير</div>
+                        </a>
+
+                        <a href="index.html?add=1" class="btn btn-primary bottom-nav-add" id="bn-add" aria-label="إضافة منتج" title="إضافة منتج">
+                            <i class="bi bi-plus-lg fs-4"></i>
+                        </a>
+
+                        <a href="../price-view/index.html" class="text-center nav-item bottom-nav-item" id="bn-price-view">
+                            <i class="bi bi-currency-dollar fs-4"></i>
+                            <div class="small">عرض سعر</div>
+                        </a>
+                        <a href="../settings/index.html" class="text-center nav-item bottom-nav-item" id="bn-settings">
+                            <i class="bi bi-gear-fill fs-4"></i>
+                            <div class="small">الإعدادات</div>
+                        </a>
+                    </div>
+                </nav>
+
+                <!-- Barcode Scanner Modal (shared) -->
+                <div class="modal fade" id="barcodeScannerModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">مسح الباركود</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <video id="barcode-video" playsinline style="width:100%;height:auto;border-radius:.5rem;display:none;"></video>
+                                <div id="barcode-fallback" class="mt-2">
+                                    <p class="text-muted">المتصفح لا يدعم مسح الباركود تلقائياً. يمكنك إدخال الكود يدوياً أو رفع صورة للباركود.</p>
+                                    <input type="text" id="barcode-manual-input" class="form-control mb-2" placeholder="أدخل أو ألصق رمز الباركود هنا">
+                                    <input type="file" id="barcode-image-input" accept="image/*" class="form-control">
+                                </div>
+                                <div id="barcode-status" class="mt-2 text-muted small"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                                <button type="button" class="btn btn-primary" id="barcode-scan-action">بحث عن المنتج</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                            <!-- Floating Action Button (FAB) for Add Product removed (replaced by bottom-nav add button) -->
+
+                <script src="../js/bootstrap.bundle.min.js"></script>
+                <script src="../js/app.js"></script>
 </body>
 
 </html>
